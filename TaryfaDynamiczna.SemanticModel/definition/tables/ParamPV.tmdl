@@ -1,0 +1,28 @@
+/// Moc instalacji fotowoltaicznej [kWp].
+table ParamPV
+	lineageTag: 29351dc2-95d2-54d4-b7a7-4b16f169d192
+
+	/// Wartość parametru (domyślnie 0).
+	measure 'PV Value' = SELECTEDVALUE ( ParamPV[PV], 0 )
+		formatString: 0.0" kWp"
+		lineageTag: e024c038-0b50-5e9c-a7bd-f8b39babd1be
+
+	column PV
+		dataType: double
+		formatString: 0.0" kWp"
+		lineageTag: 5c429f5b-cf07-515e-94b2-dcaa76443bdc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [PV]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamPV = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 200, 5 ), "PV", [Value] / 10 )
+

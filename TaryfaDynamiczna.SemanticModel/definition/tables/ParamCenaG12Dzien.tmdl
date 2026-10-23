@@ -1,0 +1,28 @@
+/// Cena energii G12, strefa dzienna (droga) [zł/kWh].
+table ParamCenaG12Dzien
+	lineageTag: 30cfd47a-fd30-5d7a-957b-dcac7d14cf41
+
+	/// Wartość parametru (domyślnie 0.5779).
+	measure 'Cena G12 dzień Value' = SELECTEDVALUE ( ParamCenaG12Dzien[Cena G12 dzień], 0.5779 )
+		formatString: 0.0000" zł/kWh"
+		lineageTag: 793063b9-3301-5041-986f-8ad0a00be726
+
+	column 'Cena G12 dzień'
+		dataType: double
+		formatString: 0.0000" zł/kWh"
+		lineageTag: d8d7750a-4c82-585f-b24c-3b7f0902d736
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Cena G12 dzień]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamCenaG12Dzien = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 1000, 15000, 1 ), "Cena G12 dzień", [Value] / 10000 )
+

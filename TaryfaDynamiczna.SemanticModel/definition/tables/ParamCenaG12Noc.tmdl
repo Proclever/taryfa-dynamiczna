@@ -1,0 +1,28 @@
+/// Cena energii G12, strefa nocna (tania) [zł/kWh].
+table ParamCenaG12Noc
+	lineageTag: f0d90a64-c21d-540b-a9b8-6264e3206933
+
+	/// Wartość parametru (domyślnie 0.3369).
+	measure 'Cena G12 noc Value' = SELECTEDVALUE ( ParamCenaG12Noc[Cena G12 noc], 0.3369 )
+		formatString: 0.0000" zł/kWh"
+		lineageTag: 300a2e5b-2b65-586d-a442-c54569dae3c6
+
+	column 'Cena G12 noc'
+		dataType: double
+		formatString: 0.0000" zł/kWh"
+		lineageTag: 19e0f06d-7f5e-5df2-85da-1c45156b44f2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Cena G12 noc]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamCenaG12Noc = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 1000, 15000, 1 ), "Cena G12 noc", [Value] / 10000 )
+

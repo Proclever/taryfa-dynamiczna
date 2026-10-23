@@ -1,0 +1,27 @@
+/// Roczne ładowanie samochodu elektrycznego w domu [kWh/rok].
+table ParamEV
+	lineageTag: 72fa2237-9a3d-5cbb-b037-1af3f25273b2
+
+	/// Wartość parametru (domyślnie 0).
+	measure 'EV Value' = SELECTEDVALUE ( ParamEV[EV], 0 )
+		formatString: #,##0" kWh"
+		lineageTag: e84f0bbc-ba66-54aa-8080-7a9960304137
+
+	column EV
+		dataType: int64
+		formatString: #,##0" kWh"
+		lineageTag: 0257c63c-55ab-5a3d-8c58-2151df06cbaf
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamEV = calculated
+		mode: import
+		source = GENERATESERIES ( 0, 8000, 100 )
+

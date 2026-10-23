@@ -1,0 +1,39 @@
+model Model
+	culture: pl-PL
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: pl-PL
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parametry
+
+queryGroup Pomocnicze
+
+queryGroup 'Tabele modelu'
+
+annotation PBI_QueryOrder = ["RepoGitHub", "GalazGitHub", "G12NocOd", "G12NocDo", "G12DzienOd", "G12DzienDo", "LicznikWgCzasuZimowego", "ProgTemperaturyPC", "DaneSurowe", "Manifest", "Okna", "fnOkno12M", "Swieta", "RynekSurowy", "PogodaGodzinowa", "PogodaKlimatologia", "StopniogodzinyNorma", "ProfilOSD", "FactRynek", "DimData", "DimSlot", "InfoDane"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table FactRynek
+ref table DimData
+ref table DimSlot
+ref table InfoDane
+ref table ParamZuzycie
+ref table ParamCenaG11
+ref table ParamCenaG12Dzien
+ref table ParamCenaG12Noc
+ref table ParamMarza
+ref table ParamEV
+ref table ParamPC
+ref table ParamPV
+ref table ParamElastycznosc
+ref table ParamTrybEV
+ref table Taryfy
+ref table OśMarży
+ref table Miary
+

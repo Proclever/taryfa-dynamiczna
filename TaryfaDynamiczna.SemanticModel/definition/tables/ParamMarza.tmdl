@@ -1,0 +1,27 @@
+/// Marża/składnik kosztowy sprzedawcy doliczany do RCE [zł/MWh]. Zakres zawiera 0 (marża graniczna).
+table ParamMarza
+	lineageTag: 24ec4524-548e-5039-a2f9-0cf6cd7edccc
+
+	/// Wartość parametru (domyślnie 87).
+	measure 'Marża Value' = SELECTEDVALUE ( ParamMarza[Marża], 87 )
+		formatString: #,##0" zł/MWh"
+		lineageTag: 1b00091c-976e-50e2-8777-371c29de6a9a
+
+	column Marża
+		dataType: int64
+		formatString: #,##0" zł/MWh"
+		lineageTag: 4c59e590-0abd-5586-bce7-fe0e86eecb99
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamMarza = calculated
+		mode: import
+		source = GENERATESERIES ( 0, 300, 1 )
+

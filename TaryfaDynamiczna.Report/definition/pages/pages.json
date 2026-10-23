@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
+  "pageOrder": [
+    "p1_werdykt",
+    "p2_twoj_dom",
+    "p3_kiedy_tani",
+    "p4_ryzyko",
+    "p5_ev_pc",
+    "p6_prosument",
+    "p7_o_danych"
+  ],
+  "activePageName": "p1_werdykt"
+}

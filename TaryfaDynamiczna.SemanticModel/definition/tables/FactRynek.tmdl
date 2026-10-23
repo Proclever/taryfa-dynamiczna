@@ -1,0 +1,341 @@
+/// Kwadranse: RCE, zapotrzebowanie KSE, PV, wiatr, temperatura i współczynniki Wsp*.
+table FactRynek
+	lineageTag: f4e01617-8f11-5361-8506-3dede88f8d9e
+
+	/// Początek kwadransa, czas lokalny (Europe/Warsaw).
+	column Timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6ec47833-797a-5460-b5e4-7487cd3091bf
+		summarizeBy: none
+		sourceColumn: Timestamp
+
+		annotation SummarizationSetBy = User
+
+	/// Doba handlowa (lokalna).
+	column Data
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f777f082-9785-5243-a4ab-8ff7dfd329ac
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = User
+
+	/// Numer kwadransa w dobie 1–N (N = 92/96/100).
+	column Kwadrans
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: be47c9a0-6ce0-5cac-a385-510c862c2115
+		summarizeBy: none
+		sourceColumn: Kwadrans
+
+		annotation SummarizationSetBy = User
+
+	/// Kwadrans zegarowy 1–96 (klucz do DimSlot).
+	column Slot
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: db27ac09-b42a-53f6-952d-642a267b0780
+		summarizeBy: none
+		sourceColumn: Slot
+
+		annotation SummarizationSetBy = User
+
+	/// Kwadrans wg czasu zimowego (UTC+1) – po nim liczone są strefy G12 (nieaktywna relacja z DimSlot).
+	column SlotZimowy
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: beee6c77-a1a0-5c2e-b78b-e9426f121f6a
+		summarizeBy: none
+		sourceColumn: SlotZimowy
+
+		annotation SummarizationSetBy = User
+
+	column CzasLetni
+		dataType: boolean
+		isHidden
+		lineageTag: 094208b3-2659-54f0-b23e-4a6b1c20f8f1
+		summarizeBy: none
+		sourceColumn: CzasLetni
+
+		annotation SummarizationSetBy = User
+
+	/// Rynkowa cena energii PSE [zł/MWh].
+	column RCE
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 86707b2a-4bc8-537c-b396-251e5e1a2e46
+		summarizeBy: none
+		sourceColumn: RCE
+
+		annotation SummarizationSetBy = User
+
+	/// Zapotrzebowanie KSE [MW].
+	column Zapotrzebowanie
+		dataType: double
+		formatString: #,##0
+		lineageTag: 14364363-a218-58ec-af82-942533c0e2a6
+		summarizeBy: none
+		sourceColumn: Zapotrzebowanie
+
+		annotation SummarizationSetBy = User
+
+	/// Krajowa generacja fotowoltaiczna [MW].
+	column PV
+		dataType: double
+		formatString: #,##0
+		lineageTag: a1a5af86-c64e-5e4a-99e7-359c1b1811d7
+		summarizeBy: none
+		sourceColumn: PV
+
+		annotation SummarizationSetBy = User
+
+	/// Krajowa generacja wiatrowa [MW].
+	column Wiatr
+		dataType: double
+		formatString: #,##0
+		lineageTag: 26ceddaa-aa10-5510-801c-6e4c5935d3c0
+		summarizeBy: none
+		sourceColumn: Wiatr
+
+		annotation SummarizationSetBy = User
+
+	/// Temperatura powietrza IMGW (stacja Poznań-Ławica) [°C].
+	column Temperatura
+		dataType: double
+		formatString: 0.0
+		lineageTag: 076d21f9-8169-5896-956f-b4c481d39a93
+		summarizeBy: none
+		sourceColumn: Temperatura
+
+		annotation SummarizationSetBy = User
+
+	/// TRUE = brak pomiaru, użyto normy (miesiąc, godzina).
+	column TemperaturaUzupełniona
+		dataType: boolean
+		isHidden
+		lineageTag: 1881793a-7ea8-58c4-9b80-05522d8632ed
+		summarizeBy: none
+		sourceColumn: TemperaturaUzupełniona
+
+		annotation SummarizationSetBy = User
+
+	/// Udział kwadransa w rocznym zużyciu wg profilu OSD (suma = 1 w każdym pełnym oknie 12 mies.).
+	column WspProfil
+		dataType: double
+		isHidden
+		lineageTag: 7edcf931-bad8-5197-8692-bd2374484238
+		summarizeBy: none
+		sourceColumn: WspProfil
+
+		annotation SummarizationSetBy = User
+
+	/// Udział w rocznym ładowaniu EV, tryb 18–22.
+	column WspEV_Wieczor
+		dataType: double
+		isHidden
+		lineageTag: 20e34811-bfe1-5a1c-a6f3-cafd53981ce7
+		summarizeBy: none
+		sourceColumn: WspEV_Wieczor
+
+		annotation SummarizationSetBy = User
+
+	/// Udział w rocznym ładowaniu EV, tryb 23–6.
+	column WspEV_Noc
+		dataType: double
+		isHidden
+		lineageTag: b44ee224-2be8-5daa-b595-e2a983c81a9e
+		summarizeBy: none
+		sourceColumn: WspEV_Noc
+
+		annotation SummarizationSetBy = User
+
+	/// Udział w rocznym ładowaniu EV, 16 najtańszych kwadransów doby.
+	column WspEV_Smart
+		dataType: double
+		isHidden
+		lineageTag: 125b67e3-cebd-5d19-89e5-0c89c9f77ae0
+		summarizeBy: none
+		sourceColumn: WspEV_Smart
+
+		annotation SummarizationSetBy = User
+
+	/// Udział w rocznym zużyciu pompy ciepła (stopniogodziny < próg).
+	column WspPC
+		dataType: double
+		isHidden
+		lineageTag: 2b053168-1a89-5ac7-9a18-27a00f5ff9ff
+		summarizeBy: none
+		sourceColumn: WspPC
+
+		annotation SummarizationSetBy = User
+
+	/// Produkcja PV [kWh/kWp] w kwadransie; suma w 12 mies. = 1000.
+	column WspPV
+		dataType: double
+		isHidden
+		lineageTag: 19d0377c-fae5-5f60-a08d-a15fb7d1e9d4
+		summarizeBy: none
+		sourceColumn: WspPV
+
+		annotation SummarizationSetBy = User
+
+	/// 1 = najtańszy kwadrans doby (do 92/96/100).
+	column RangaCenyWDobie
+		dataType: int64
+		formatString: 0
+		lineageTag: e858525c-84f6-5d05-bc28-52f71929a408
+		summarizeBy: none
+		sourceColumn: RangaCenyWDobie
+
+		annotation SummarizationSetBy = User
+
+	/// RCE < 0.
+	column CenaUjemna
+		dataType: boolean
+		lineageTag: 292586a4-c10a-51d5-ad5a-60039d0eda3c
+		summarizeBy: none
+		sourceColumn: CenaUjemna
+
+		annotation SummarizationSetBy = User
+
+	/// „1 h” do 30.09.2025 (RCE godzinowe), „15 min” od 1.10.2025.
+	column Granulacja
+		dataType: string
+		lineageTag: 07319cde-d5cf-555c-b483-6b32b1b0e37d
+		summarizeBy: none
+		sourceColumn: Granulacja
+
+		annotation SummarizationSetBy = User
+
+	partition FactRynek = m
+		mode: import
+		queryGroup: 'Tabele modelu'
+		source =
+				// Fakt: jeden wiersz = jeden kwadrans. Ujednolicenie granulacji RCE i wszystkie współczynniki Wsp*
+				// (udziały w rocznym zużyciu), żeby miary DAX mnożyły tylko kolumny przez parametry.
+				let
+				    Zrodlo = RynekSurowy,
+				
+				    // --- 1. Czas: slot zegarowy 1–96, slot wg czasu zimowego (strefy G12), pełna godzina UTC (klucz pogody)
+				    Godzina = Table.AddColumn(Zrodlo, "Godzina", each Time.Hour([Timestamp]), Int64.Type),
+				    Slot = Table.AddColumn(Godzina, "Slot", each [Godzina] * 4 + Number.IntegerDivide(Time.Minute([Timestamp]), 15) + 1, Int64.Type),
+				    SlotZimowy = Table.AddColumn(Slot, "SlotZimowy", each
+				        if LicznikWgCzasuZimowego then
+				            let t = [OdUTC] + #duration(0, 1, 0, 0)
+				            in Time.Hour(t) * 4 + Number.IntegerDivide(Time.Minute(t), 15) + 1
+				        else [Slot], Int64.Type),
+				    GodzinaUTC = Table.AddColumn(SlotZimowy, "GodzinaUTC", each
+				        DateTime.From(Date.From([OdUTC])) + #duration(0, Time.Hour([OdUTC]), 0, 0), type datetime),
+				
+				    // --- 2. Granulacja: do 30.09.2025 RCE było godzinowe, od 1.10.2025 jest 15-minutowe.
+				    //        Kwadrans bez ceny dostaje cenę swojej godziny (powielenie x4 danych godzinowych).
+				    CenyGodzin = Table.Group(GodzinaUTC, {"GodzinaUTC"}, {{"RCE_godziny", each List.First(List.RemoveNulls([RCE])), type nullable number}}),
+				    ZCenaGodziny = Table.NestedJoin(GodzinaUTC, {"GodzinaUTC"}, CenyGodzin, {"GodzinaUTC"}, "CG", JoinKind.LeftOuter),
+				    RozwinCeneGodziny = Table.ExpandTableColumn(ZCenaGodziny, "CG", {"RCE_godziny"}),
+				    RCEPelne = Table.AddColumn(RozwinCeneGodziny, "RCE_pelne", each if [RCE] = null then [RCE_godziny] else [RCE], type nullable number),
+				    RCEZamiana = Table.RenameColumns(Table.RemoveColumns(RCEPelne, {"RCE", "RCE_godziny"}), {{"RCE_pelne", "RCE"}}),
+				    Granulacja = Table.AddColumn(RCEZamiana, "Granulacja", each if [Data] < #date(2025, 10, 1) then "1 h" else "15 min", type text),
+				
+				    // --- 3. Doba: liczba kwadransów (92/96/100), okna EV i ranga ceny w dobie (1 = najtańszy kwadrans)
+				    PoDobach = Table.Group(Granulacja, {"Data"}, {{"T", each
+				        let
+				            t = Table.AddColumn(_, "BrakCeny", each if [RCE] = null then 1 else 0, Int64.Type),
+				            n = Table.RowCount(t),
+				            nWieczor = List.Count(List.Select(t[Godzina], each _ >= 18 and _ < 22)),
+				            nNoc = List.Count(List.Select(t[Godzina], each _ >= 23 or _ < 6)),
+				            nZCena = List.Count(List.RemoveNulls(t[RCE])),
+				            Posortowane = Table.Sort(t, {{"BrakCeny", Order.Ascending}, {"RCE", Order.Ascending}, {"OdUTC", Order.Ascending}}),
+				            ZIndeksem = Table.AddIndexColumn(Posortowane, "RangaTmp", 1, 1, Int64.Type),
+				            ZeStatystyka = Table.AddColumn(ZIndeksem, "Statystyka", each
+				                [KwadransowWDobie = n, KwadransowWieczor = nWieczor, KwadransowNoc = nNoc, KwadransowZCena = nZCena])
+				        in
+				            ZeStatystyka, type table}}),
+				    Doby = Table.Combine(PoDobach[T]),
+				    Statystyka = Table.ExpandRecordColumn(Doby, "Statystyka", {"KwadransowWDobie", "KwadransowWieczor", "KwadransowNoc", "KwadransowZCena"}),
+				    Ranga = Table.AddColumn(Statystyka, "RangaCenyWDobie", each if [RCE] = null then null else [RangaTmp], Int64.Type),
+				
+				    // --- 4. EV: każda doba dostaje 1/365 (1/366) rocznej energii, rozłożonej równo na kwadranse okna
+				    DniWRoku = Table.AddColumn(Ranga, "DniWRoku", each if Date.IsLeapYear([Data]) then 366 else 365, Int64.Type),
+				    EVWieczor = Table.AddColumn(DniWRoku, "WspEV_Wieczor", each
+				        if [Godzina] >= 18 and [Godzina] < 22 and [KwadransowWieczor] > 0
+				        then 1 / ([DniWRoku] * [KwadransowWieczor]) else 0, type number),
+				    EVNoc = Table.AddColumn(EVWieczor, "WspEV_Noc", each
+				        if ([Godzina] >= 23 or [Godzina] < 6) and [KwadransowNoc] > 0
+				        then 1 / ([DniWRoku] * [KwadransowNoc]) else 0, type number),
+				    EVSmart = Table.AddColumn(EVNoc, "WspEV_Smart", each
+				        let k = List.Min({16, [KwadransowZCena]})
+				        in if [RangaCenyWDobie] <> null and [RangaCenyWDobie] <= 16 and k > 0 then 1 / ([DniWRoku] * k) else 0, type number),
+				
+				    // --- 5. Profil OSD: udział slotu w roku; w dobie jesiennej zmiany czasu sloty 02:00–02:45 występują dwa razy
+				    WSlocie = Table.AddColumn(EVSmart, "KwadransowWSlocie", each if [KwadransowWDobie] = 100 and [Godzina] = 2 then 2 else 1, Int64.Type),
+				    ZProfilem = Table.NestedJoin(WSlocie, {"Data", "Slot"}, ProfilOSD, {"Data", "Slot"}, "P", JoinKind.LeftOuter),
+				    RozwinProfil = Table.ExpandTableColumn(ZProfilem, "P", {"UdzialProfilu"}),
+				    WspProfil = Table.AddColumn(RozwinProfil, "WspProfil", each
+				        if [UdzialProfilu] = null then 0 else [UdzialProfilu] / [KwadransowWSlocie], type number),
+				
+				    // --- 6. Temperatura (IMGW, UTC) + uzupełnienie luk normą (miesiąc, godzina); pompa ciepła = stopniogodziny
+				    ZTemp = Table.NestedJoin(WspProfil, {"GodzinaUTC"}, PogodaGodzinowa, {"GodzinaUTC"}, "TP", JoinKind.LeftOuter),
+				    RozwinTemp = Table.ExpandTableColumn(ZTemp, "TP", {"Temperatura"}, {"TemperaturaPomiar"}),
+				    KluczKlim = Table.AddColumn(
+				        Table.AddColumn(RozwinTemp, "MiesiacUTC", each Date.Month([GodzinaUTC]), Int64.Type),
+				        "GodzinaDobyUTC", each Time.Hour([GodzinaUTC]), Int64.Type),
+				    ZKlim = Table.NestedJoin(KluczKlim, {"MiesiacUTC", "GodzinaDobyUTC"}, PogodaKlimatologia, {"Miesiąc", "GodzinaDoby"}, "K", JoinKind.LeftOuter),
+				    RozwinKlim = Table.ExpandTableColumn(ZKlim, "K", {"TemperaturaNorma"}),
+				    Temperatura = Table.AddColumn(RozwinKlim, "Temperatura", each
+				        if [TemperaturaPomiar] <> null then [TemperaturaPomiar] else [TemperaturaNorma], type nullable number),
+				    TempUzupelniona = Table.AddColumn(Temperatura, "TemperaturaUzupełniona", each [TemperaturaPomiar] = null, type logical),
+				    NormaDH = StopniogodzinyNorma,
+				    WspPC = Table.AddColumn(TempUzupelniona, "WspPC", each
+				        if [Temperatura] = null or NormaDH = null or NormaDH = 0 then 0
+				        else 0.25 * List.Max({0, ProgTemperaturyPC - [Temperatura]}) / NormaDH, type number),
+				
+				    // --- 7. Okna 12-miesięczne (fnOkno12M): PV przeskalowane do 1000 kWh/kWp, profil OSD do sumy 1 w oknie.
+				    //        Normalizacja w oknie usuwa wpływ przyrostu mocy PV w kraju i różnic między profilami kolejnych lat
+				    //        (okno październik–wrzesień łączy dwa profile roczne), więc w pełnym oknie zużycie = parametr.
+				    //        Okna niepełne (< 365 dób) zostają przy normalizacji roku kalendarzowego z ProfilOSD.
+				    //        Table.Buffer: tabela jest czytana kilka razy – bez bufora cały łańcuch liczyłby się od nowa.
+				    ZOknem = Table.Buffer(Table.AddColumn(WspPC, "Okno", each fnOkno12M([Data]), type text)),
+				    SumyOkien = Table.Group(ZOknem, {"Okno"}, {
+				        {"SumaPV", each List.Sum([PV]), type nullable number},
+				        {"SumaProfilu", each List.Sum([WspProfil]), type nullable number},
+				        {"Dob", each List.Count(List.Distinct([Data])), Int64.Type}}),
+				    SumaPVWszystko = List.Sum(ZOknem[PV]),
+				    MapaPV = Record.FromList(SumyOkien[SumaPV], SumyOkien[Okno]),
+				    PelneOkna = Table.SelectRows(SumyOkien, each [Dob] >= 365),
+				    MapaProfilu = Record.FromList(PelneOkna[SumaProfilu], PelneOkna[Okno]),
+				    OknoOdniesienia = (okno as text) as text =>
+				        if okno = "Wcześniej" then "Poprzednie 12 mies."
+				        else if okno = "Bieżący miesiąc" then "Ostatnie 12 mies."
+				        else okno,
+				    WspPV = Table.AddColumn(ZOknem, "WspPV", each
+				        let s = Record.FieldOrDefault(MapaPV, OknoOdniesienia([Okno]), SumaPVWszystko)
+				        in if [PV] = null or s = null or s = 0 then 0 else 1000 * [PV] / s, type number),
+				    ProfilOkna = Table.AddColumn(WspPV, "WspProfilOkna", each
+				        let s = Record.FieldOrDefault(MapaProfilu, OknoOdniesienia([Okno]), null)
+				        in if s = null or s = 0 then [WspProfil] else [WspProfil] / s, type number),
+				    ProfilWOknie = Table.RenameColumns(Table.RemoveColumns(ProfilOkna, {"WspProfil"}), {{"WspProfilOkna", "WspProfil"}}),
+				
+				    // --- 8. Flagi i porządki
+				    CenaUjemna = Table.AddColumn(ProfilWOknie, "CenaUjemna", each [RCE] <> null and [RCE] < 0, type logical),
+				    CzasLetni = Table.TransformColumns(CenaUjemna, {{"CzasLetni", each _ = 1, type logical}}),
+				    Wynik = Table.SelectColumns(CzasLetni, {
+				        "Timestamp", "Data", "Kwadrans", "Slot", "SlotZimowy", "CzasLetni", "RCE", "Zapotrzebowanie", "PV", "Wiatr",
+				        "Temperatura", "TemperaturaUzupełniona", "WspProfil", "WspEV_Wieczor", "WspEV_Noc", "WspEV_Smart", "WspPC",
+				        "WspPV", "RangaCenyWDobie", "CenaUjemna", "Granulacja"}),
+				    Typy = Table.TransformColumnTypes(Wynik, {
+				        {"Timestamp", type datetime}, {"Data", type date}, {"Kwadrans", Int64.Type}, {"Slot", Int64.Type},
+				        {"SlotZimowy", Int64.Type}, {"CzasLetni", type logical}, {"RCE", type number}, {"Zapotrzebowanie", type number},
+				        {"PV", type number}, {"Wiatr", type number}, {"Temperatura", type number}, {"TemperaturaUzupełniona", type logical},
+				        {"WspProfil", type number}, {"WspEV_Wieczor", type number}, {"WspEV_Noc", type number},
+				        {"WspEV_Smart", type number}, {"WspPC", type number}, {"WspPV", type number},
+				        {"RangaCenyWDobie", Int64.Type}, {"CenaUjemna", type logical}, {"Granulacja", type text}})
+				in
+				    Typy
+
+	annotation PBI_ResultType = Table
+

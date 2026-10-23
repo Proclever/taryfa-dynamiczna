@@ -1,0 +1,15 @@
+# Power BI – ustawienia lokalne i cache
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+*.pbix.bak
+# Surowe pliki źródłowe (np. XLSX profilu OSD) – w repo trzymamy przetworzone CSV
+data/zrodla/
+# Python
+__pycache__/
+.pytest_cache/
+.venv/
+# pliki tymczasowe przerwanego zapisu CSV
+data/**/.tmp_*
+*.part
+# kopie plików zapisane przez aplikację Claude
+Claude outputs/

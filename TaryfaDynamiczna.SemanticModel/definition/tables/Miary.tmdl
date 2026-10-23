@@ -1,0 +1,879 @@
+/// Tabela miar raportu.
+table Miary
+	lineageTag: f44c4bb8-9012-5a34-8fe5-2d6e79a61507
+
+	/// Roczne zużycie domu w wybranym okresie: profil OSD + ładowanie EV (wg trybu) + pompa ciepła.
+	measure 'kWh łącznie' =
+			-- parametry pobierane raz, PRZED iteratorem (bez przejścia kontekstu w każdym wierszu)
+			VAR _z = [Zużycie Value]
+			VAR _ev = [EV Value]
+			VAR _pc = [PC Value]
+			VAR _tryb = [Tryb EV Value]
+			RETURN
+			    SUMX (
+			        FactRynek,
+			        _z * FactRynek[WspProfil]
+			                + _ev * SWITCH ( _tryb, "Noc", FactRynek[WspEV_Noc], "Smart", FactRynek[WspEV_Smart], FactRynek[WspEV_Wieczor] )
+			                + _pc * FactRynek[WspPC]
+			    )
+		formatString: #,##0" kWh"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: 8c8272f1-4353-59dc-a248-ff7875c51401
+
+	/// Koszt energii czynnej w taryfie dynamicznej: kWh kwadransa × (RCE + marża) / 1000.
+	measure 'Koszt – dynamiczna' =
+			-- ten sam wzór na kWh, pomnożony przez cenę kwadransa (RCE w zł/MWh + marża sprzedawcy)
+			VAR _z = [Zużycie Value]
+			VAR _ev = [EV Value]
+			VAR _pc = [PC Value]
+			VAR _tryb = [Tryb EV Value]
+			VAR _m = [Marża Value]
+			RETURN
+			    SUMX (
+			        FactRynek,
+			        VAR _kwh =
+			            _z * FactRynek[WspProfil]
+			                + _ev * SWITCH ( _tryb, "Noc", FactRynek[WspEV_Noc], "Smart", FactRynek[WspEV_Smart], FactRynek[WspEV_Wieczor] )
+			                + _pc * FactRynek[WspPC]
+			        RETURN
+			            _kwh * ( FactRynek[RCE] + _m ) / 1000
+			    )
+		formatString: #,##0" zł"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: 9e050ae1-08d4-5743-b4ed-a0e76aabdd4b
+
+	/// Koszt energii czynnej w G11 (cena z faktury, zł/kWh).
+	measure 'Koszt – G11' = [kWh łącznie] * [Cena G11 Value]
+		formatString: #,##0" zł"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: 9dd7431e-1c00-5cce-96ba-53cee4c4ff92
+
+	/// Koszt energii czynnej w G12. Strefa kwadransa wg DimSlot po kolumnie SlotZimowy (liczniki Enei chodzą wg czasu zimowego).
+	measure 'Koszt – G12' =
+			VAR _tania =
+			    CALCULATE (
+			        [kWh łącznie],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "tania"
+			    )
+			VAR _droga =
+			    CALCULATE (
+			        [kWh łącznie],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "droga"
+			    )
+			RETURN
+			    _tania * [Cena G12 noc Value] + _droga * [Cena G12 dzień Value]
+		formatString: #,##0" zł"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: 1fa0310b-cd6c-51dc-a573-b1dbc7bd4e6d
+
+	/// Koszt w taryfie dynamicznej przy zerowej marży – sama RCE ważona profilem zużycia.
+	measure 'Koszt – dynamiczna (bez marży)' = CALCULATE ( [Koszt – dynamiczna], ParamMarza[Marża] = 0 )
+		formatString: #,##0" zł"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: d41705a9-232b-51c9-904e-88dadf611d76
+
+	/// Koszt dynamiczny, gdy część zużycia (Elastyczność) codziennie przenosisz do 16 najtańszych kwadransów doby.
+	measure 'Koszt – dynamiczna z przesunięciem' =
+			-- udział e zużycia każdej doby ląduje w 16 najtańszych kwadransach
+			VAR _e = [Elastyczność Value]
+			VAR _m = [Marża Value]
+			RETURN
+			    SUMX (
+			        VALUES ( DimData[Data] ),
+			        VAR _sztywny = ( 1 - _e ) * [Koszt – dynamiczna]
+			        VAR _kwhDoba = [kWh łącznie]
+			        VAR _cenaTania =
+			            CALCULATE ( AVERAGE ( FactRynek[RCE] ), FactRynek[RangaCenyWDobie] <= 16 ) + _m
+			        RETURN
+			            _sztywny + _e * _kwhDoba * _cenaTania / 1000
+			    )
+		formatString: #,##0" zł"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: d76c283a-f459-5639-95eb-a1e682d07727
+
+	/// Ile daje przesunięcie elastycznej części zużycia w najtańsze kwadranse.
+	measure 'Zysk z przesunięcia' = [Koszt – dynamiczna] - [Koszt – dynamiczna z przesunięciem]
+		formatString: #,##0" zł"
+		displayFolder: 1. Zużycie i koszty
+		lineageTag: f902aa02-4597-53df-b443-91bcabc27543
+
+	/// Dodatnia = taryfa dynamiczna tańsza od G11.
+	measure 'Oszczędność vs G11' = [Koszt – G11] - [Koszt – dynamiczna]
+		formatString: #,##0" zł"
+		displayFolder: 2. Porównanie taryf
+		lineageTag: 6c907072-49f9-5bb0-aa40-e5d97795b808
+
+	/// Oszczędność względem kosztu w G11.
+	measure 'Oszczędność %' = DIVIDE ( [Oszczędność vs G11], [Koszt – G11] )
+		formatString: 0.0%
+		displayFolder: 2. Porównanie taryf
+		lineageTag: c07cd443-4534-57e2-99f3-dc984ee2c852
+
+	/// Dodatnia = taryfa dynamiczna tańsza od G12.
+	measure 'Oszczędność vs G12' = [Koszt – G12] - [Koszt – dynamiczna]
+		formatString: #,##0" zł"
+		displayFolder: 2. Porównanie taryf
+		lineageTag: 2160f4b7-3cb9-5050-b354-e8992fd0935e
+
+	measure 'Oszczędność vs G12 %' = DIVIDE ( [Oszczędność vs G12], [Koszt – G12] )
+		formatString: 0.0%
+		displayFolder: 2. Porównanie taryf
+		lineageTag: 98bf8bd2-263a-593c-9b37-52f74960a6df
+
+	/// Średnia cena zapłacona w taryfie dynamicznej (z marżą).
+	measure 'Efektywna cena dynamiczna (zł/kWh)' = DIVIDE ( [Koszt – dynamiczna], [kWh łącznie] )
+		formatString: 0.000" zł/kWh"
+		displayFolder: 2. Porównanie taryf
+		lineageTag: a59ff99a-63a6-51d1-84c2-99cb5ec43bd2
+
+	measure 'Efektywna cena G12 (zł/kWh)' = DIVIDE ( [Koszt – G12], [kWh łącznie] )
+		formatString: 0.000" zł/kWh"
+		displayFolder: 2. Porównanie taryf
+		lineageTag: 74bb1ff3-ad10-59cd-903e-cfb8828e5177
+
+	/// Marża sprzedawcy, przy której roczny koszt w taryfie dynamicznej zrównuje się z G11.
+	measure 'Marża graniczna (zł/MWh)' =
+			-- marża, przy której dynamiczna = G11
+			VAR _bezMarzy = CALCULATE ( [Koszt – dynamiczna], ParamMarza[Marża] = 0 )
+			RETURN
+			    DIVIDE ( [Koszt – G11] - _bezMarzy, [kWh łącznie] ) * 1000
+		formatString: #,##0" zł/MWh"
+		displayFolder: 2. Porównanie taryf
+		lineageTag: e05613d8-9b30-5e0d-9a4d-e8afbf4a0c61
+
+	/// Koszt taryfy z wiersza tabeli Taryfy (oś wykresów porównania).
+	measure 'Koszt wybranej taryfy' =
+			SWITCH (
+			    SELECTEDVALUE ( Taryfy[Taryfa] ),
+			    "G11", [Koszt – G11],
+			    "G12", [Koszt – G12],
+			    "Dynamiczna", [Koszt – dynamiczna]
+			)
+		formatString: #,##0" zł"
+		displayFolder: 2. Porównanie taryf
+		lineageTag: 462021fe-6daf-5533-9782-222816883bf9
+
+	/// Kolor słupka taryfy – stały dla encji.
+	measure 'Kolor taryfy' =
+			-- kolor encji: taryfa dynamiczna = akcent, G11/G12 = szarości kontekstu (te same we wszystkich wykresach)
+			SWITCH (
+			    SELECTEDVALUE ( Taryfy[Taryfa] ),
+			    "Dynamiczna", "#2A78D6",
+			    "G11", "#52514E",
+			    "G12", "#898781"
+			)
+		displayFolder: 2. Porównanie taryf
+		lineageTag: 40edcfcd-1b54-5b96-98a1-fffb570f1242
+
+	/// Prosta średnia RCE (każdy kwadrans waży tyle samo).
+	measure 'Średnia RCE (zł/kWh)' = AVERAGE ( FactRynek[RCE] ) / 1000
+		formatString: 0.000" zł/kWh"
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 8bbccf2d-9577-5b97-9de3-5db47a169fb3
+
+	measure 'Średnia RCE (zł/MWh)' = AVERAGE ( FactRynek[RCE] )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 44dc4be6-5e63-57e6-96bb-e498e852a0b2
+
+	/// RCE ważona zużyciem domu – to, co realnie „płaci” profil.
+	measure 'Średnia RCE ważona profilem (zł/MWh)' = DIVIDE ( [Koszt – dynamiczna (bez marży)], [kWh łącznie] ) * 1000
+		formatString: #,##0" zł/MWh"
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 14b1d4f1-24ca-5675-8b7a-630c70694143
+
+	/// Różnica między RCE ważoną profilem domu a prostą średnią RCE.
+	measure 'Kara za profil (zł/kWh)' =
+			-- ile więcej płacisz, bo zużywasz w drogich godzinach
+			[Efektywna cena dynamiczna (zł/kWh)] - [Marża Value] / 1000 - [Średnia RCE (zł/kWh)]
+		formatString: 0.000" zł/kWh"
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 63daae01-5bee-5f81-8839-63d87c28b797
+
+	/// Udział kwadransów z RCE ≤ 0 wśród kwadransów z opublikowaną ceną (brak ceny ≠ cena zerowa).
+	measure 'Udział kwadransów z ceną ≤ 0' =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( FactRynek ), FactRynek[RCE] <= 0 && NOT ISBLANK ( FactRynek[RCE] ) ),
+			    COUNT ( FactRynek[RCE] )
+			)
+		formatString: 0.0%
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 924dc00b-1415-5ffc-941b-87190dd285e9
+
+	measure 'Kwadranse z ceną ujemną' = CALCULATE ( COUNTROWS ( FactRynek ), FactRynek[CenaUjemna] = TRUE () )
+		formatString: #,##0
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 9feac2cd-89fb-5cf4-8d69-0282ed0d6d1d
+
+	/// Liczba kwadransów z RCE ≤ 0 przeliczona na godziny (bez kwadransów bez ceny).
+	measure 'Godziny z ceną ≤ 0' = CALCULATE ( COUNTROWS ( FactRynek ), FactRynek[RCE] <= 0 && NOT ISBLANK ( FactRynek[RCE] ) ) / 4
+		formatString: #,##0" h"
+		displayFolder: 3. Rynek i ceny
+		lineageTag: d22d9bf3-78af-5552-86d2-65e7da62c4ae
+
+	measure 'Temperatura średnia (°C)' = AVERAGE ( FactRynek[Temperatura] )
+		formatString: 0.0" °C"
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 6921c826-b08f-51ce-bb53-4d710d743b37
+
+	/// Generacja PV + wiatr względem zapotrzebowania KSE (energia w okresie).
+	measure 'Udział PV i wiatru w zapotrzebowaniu' =
+			DIVIDE (
+			    SUM ( FactRynek[PV] ) + SUM ( FactRynek[Wiatr] ),
+			    SUM ( FactRynek[Zapotrzebowanie] )
+			)
+		formatString: 0.0%
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 07ae0dcc-a139-502c-9b2d-946a27c6d70e
+
+	/// Średnia RCE do mapy ciepła (bez jednostki w komórce).
+	measure 'Średnia RCE – komórka' = AVERAGE ( FactRynek[RCE] )
+		formatString: #,##0
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 0ee9bca8-7f3b-59cf-90bd-7b750b2d0bef
+
+	/// Średnia RCE w danej porze doby względem średniej z całej doby (=100).
+	measure 'Indeks RCE (średnia = 100)' =
+			DIVIDE (
+			    [Średnia RCE (zł/MWh)],
+			    CALCULATE ( [Średnia RCE (zł/MWh)], REMOVEFILTERS ( DimSlot ) )
+			) * 100
+		formatString: 0
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 9f633a31-5047-534b-8013-73c87e4739ac
+
+	measure 'Indeks zużycia (średnia = 100)' =
+			-- zużycie na kwadrans w danej porze doby względem średniego kwadransa (=100)
+			VAR _sloty = COUNTROWS ( VALUES ( DimSlot[Slot] ) )
+			VAR _wszystkie = CALCULATE ( COUNTROWS ( VALUES ( DimSlot[Slot] ) ), REMOVEFILTERS ( DimSlot ) )
+			RETURN
+			    DIVIDE (
+			        DIVIDE ( [kWh łącznie], _sloty ),
+			        DIVIDE ( CALCULATE ( [kWh łącznie], REMOVEFILTERS ( DimSlot ) ), _wszystkie )
+			    ) * 100
+		formatString: 0
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 87fbcd6d-f9d7-561a-959a-77ddcf490d43
+
+	/// Jaka część zużycia domu przypada na daną godzinę/kwadrans doby.
+	measure 'Udział godziny w zużyciu' =
+			DIVIDE (
+			    [kWh łącznie],
+			    CALCULATE ( [kWh łącznie], REMOVEFILTERS ( DimSlot ) )
+			)
+		formatString: 0.0%
+		displayFolder: 3. Rynek i ceny
+		lineageTag: 1dda9e8c-872e-5579-bb6d-5b143c1eaa9c
+
+	measure 'P05 RCE (zł/MWh)' = PERCENTILE.INC ( FactRynek[RCE], 0.05 )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: c97241e2-6b0e-50ad-832b-8e9cd022125f
+
+	measure 'Mediana RCE (zł/MWh)' = PERCENTILE.INC ( FactRynek[RCE], 0.5 )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: dd34fac8-ae40-549d-af55-0185a1273177
+
+	measure 'P95 RCE (zł/MWh)' = PERCENTILE.INC ( FactRynek[RCE], 0.95 )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: 90b1cd68-9093-559a-b40c-7f0d7ce2fcb4
+
+	measure 'P95 ceny (zł/kWh)' = PERCENTILE.INC ( FactRynek[RCE], 0.95 ) / 1000
+		formatString: 0.000" zł/kWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: b6886350-713c-5cb6-9dee-b525aeb71687
+
+	measure 'Maks. RCE (zł/MWh)' = MAX ( FactRynek[RCE] )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: 58df7185-86a0-5b3a-ade8-97493ec4cbc4
+
+	measure 'Min. RCE (zł/MWh)' = MIN ( FactRynek[RCE] )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: 47ad5b7b-d7b1-53ab-8237-6c646f9ed788
+
+	measure 'Odchylenie std. RCE (zł/MWh)' = STDEV.P ( FactRynek[RCE] )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: 4d9ff1a5-1a98-57aa-b3fc-165a53289920
+
+	/// Koszt najdroższego miesiąca w taryfie dynamicznej.
+	measure 'Najdroższy miesiąc (zł)' = MAXX ( VALUES ( DimData[RokMiesiąc] ), [Koszt – dynamiczna] )
+		formatString: #,##0" zł"
+		displayFolder: 4. Ryzyko
+		lineageTag: 4571b0f9-dfac-5eef-bf2b-7b39c697522f
+
+	measure 'Najdroższy miesiąc – nazwa' =
+			VAR _top = TOPN ( 1, VALUES ( DimData[RokMiesiąc] ), [Koszt – dynamiczna], DESC )
+			RETURN
+			    CALCULATE ( SELECTEDVALUE ( DimData[MiesiącRok] ), _top )
+		displayFolder: 4. Ryzyko
+		lineageTag: e095b4e4-68cd-5a3b-9f12-b8e92b73f820
+
+	/// Koszt w G11 w tym samym (najdroższym dla taryfy dynamicznej) miesiącu.
+	measure 'Koszt G11 w najdroższym miesiącu' =
+			VAR _top = TOPN ( 1, VALUES ( DimData[RokMiesiąc] ), [Koszt – dynamiczna], DESC )
+			RETURN
+			    CALCULATE ( [Koszt – G11], _top )
+		formatString: #,##0" zł"
+		displayFolder: 4. Ryzyko
+		lineageTag: 7bffeb6e-dc96-5adf-b89e-33e6cfdbcb1b
+
+	/// 1 = doba z najwyższą średnią RCE w wybranym okresie.
+	measure 'Ranga doby wg ceny' =
+			IF (
+			    HASONEVALUE ( DimData[Data] ),
+			    RANKX ( ALLSELECTED ( DimData[Data] ), [Średnia RCE (zł/MWh)], , DESC, SKIP )
+			)
+		formatString: #,##0
+		displayFolder: 4. Ryzyko
+		lineageTag: ce2a7568-2feb-5f20-9aeb-28c7131c583e
+
+	measure 'Top 10 – średnia RCE (zł/MWh)' =
+			VAR _r = [Ranga doby wg ceny]
+			RETURN
+			    IF ( NOT ISBLANK ( _r ) && _r <= 10, [Średnia RCE (zł/MWh)] )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: 0cf674c1-2e15-5490-b802-aff17f0f218e
+
+	measure 'Top 10 – maks. RCE (zł/MWh)' =
+			VAR _r = [Ranga doby wg ceny]
+			RETURN
+			    IF ( NOT ISBLANK ( _r ) && _r <= 10, [Maks. RCE (zł/MWh)] )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: 183eac06-dcab-5ba8-800b-e410b4510455
+
+	measure 'Top 10 – temperatura (°C)' =
+			VAR _r = [Ranga doby wg ceny]
+			RETURN
+			    IF ( NOT ISBLANK ( _r ) && _r <= 10, [Temperatura średnia (°C)] )
+		formatString: 0.0" °C"
+		displayFolder: 4. Ryzyko
+		lineageTag: 480450cf-8a86-5d72-8278-bc7a4bdc0845
+
+	measure 'Top 10 – udział PV i wiatru' =
+			VAR _r = [Ranga doby wg ceny]
+			RETURN
+			    IF ( NOT ISBLANK ( _r ) && _r <= 10, [Udział PV i wiatru w zapotrzebowaniu] )
+		formatString: 0.0%
+		displayFolder: 4. Ryzyko
+		lineageTag: 9323c3cb-cc8b-5f17-9375-17ee878237d0
+
+	measure 'Średnia RCE – ostatnie 12 mies.' = CALCULATE ( [Średnia RCE (zł/MWh)], DimData[Okno12M] = "Ostatnie 12 mies." )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: dc4612b5-b572-5631-8a90-a60f7f11b3a2
+
+	measure 'Średnia RCE – poprzednie 12 mies.' = CALCULATE ( [Średnia RCE (zł/MWh)], DimData[Okno12M] = "Poprzednie 12 mies." )
+		formatString: #,##0" zł/MWh"
+		displayFolder: 4. Ryzyko
+		lineageTag: f6b26ddf-8c0b-5417-bc3d-eef47d3ab366
+
+	measure 'Koszt – dynamiczna (ostatnie 12 mies.)' = CALCULATE ( [Koszt – dynamiczna], DimData[Okno12M] = "Ostatnie 12 mies." )
+		formatString: #,##0" zł"
+		displayFolder: 4. Ryzyko
+		lineageTag: 67333cdf-e90e-5d6f-9167-3ac8bf371ab9
+
+	measure 'Koszt – dynamiczna (poprzednie 12 mies.)' = CALCULATE ( [Koszt – dynamiczna], DimData[Okno12M] = "Poprzednie 12 mies." )
+		formatString: #,##0" zł"
+		displayFolder: 4. Ryzyko
+		lineageTag: bf9f979b-9c14-5faa-81f4-b74799765ada
+
+	measure 'Koszt – G11 (ostatnie 12 mies.)' = CALCULATE ( [Koszt – G11], DimData[Okno12M] = "Ostatnie 12 mies." )
+		formatString: #,##0" zł"
+		displayFolder: 4. Ryzyko
+		lineageTag: 84567f68-42c7-58d1-8821-435d631237d3
+
+	measure 'Koszt – G11 (poprzednie 12 mies.)' = CALCULATE ( [Koszt – G11], DimData[Okno12M] = "Poprzednie 12 mies." )
+		formatString: #,##0" zł"
+		displayFolder: 4. Ryzyko
+		lineageTag: 9221e940-719e-5219-8b5c-7f245509b061
+
+	/// Zmiana rocznego kosztu dynamicznego: ostatnie 12 mies. vs poprzednie 12 mies.
+	measure 'Zmiana kosztu dynamicznego r/r' =
+			DIVIDE (
+			    [Koszt – dynamiczna (ostatnie 12 mies.)] - [Koszt – dynamiczna (poprzednie 12 mies.)],
+			    [Koszt – dynamiczna (poprzednie 12 mies.)]
+			)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4. Ryzyko
+		lineageTag: 954877d5-b750-56fc-8457-554731336edd
+
+	measure 'kWh EV' =
+			VAR _ev = [EV Value]
+			VAR _tryb = [Tryb EV Value]
+			RETURN
+			    _ev
+			        * SWITCH (
+			            _tryb,
+			            "Noc", SUM ( FactRynek[WspEV_Noc] ),
+			            "Smart", SUM ( FactRynek[WspEV_Smart] ),
+			            SUM ( FactRynek[WspEV_Wieczor] )
+			        )
+		formatString: #,##0" kWh"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 4da00e91-c28e-58f6-b88b-5bf338e3af25
+
+	/// Koszt ładowania auta w taryfie dynamicznej dla trybu z ParamTrybEV.
+	measure 'Koszt EV – dynamiczna' =
+			VAR _ev = [EV Value]
+			VAR _tryb = [Tryb EV Value]
+			VAR _m = [Marża Value]
+			RETURN
+			    _ev / 1000
+			        * SWITCH (
+			            _tryb,
+			            "Noc", SUMX ( FactRynek, FactRynek[WspEV_Noc] * ( FactRynek[RCE] + _m ) ),
+			            "Smart", SUMX ( FactRynek, FactRynek[WspEV_Smart] * ( FactRynek[RCE] + _m ) ),
+			            SUMX ( FactRynek, FactRynek[WspEV_Wieczor] * ( FactRynek[RCE] + _m ) )
+			        )
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 59ac56d6-9b3c-58eb-bebc-7c702bc3d619
+
+	measure 'Koszt EV – G11' = [kWh EV] * [Cena G11 Value]
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 3f5831d3-2605-5143-8f1b-e4c46259de43
+
+	measure 'Koszt EV – G12' =
+			VAR _tania =
+			    CALCULATE (
+			        [kWh EV],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "tania"
+			    )
+			VAR _droga =
+			    CALCULATE (
+			        [kWh EV],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "droga"
+			    )
+			RETURN
+			    _tania * [Cena G12 noc Value] + _droga * [Cena G12 dzień Value]
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 65a4c12c-9705-514b-9554-3e477030bb49
+
+	measure 'Efektywna cena EV – dynamiczna (zł/kWh)' = DIVIDE ( [Koszt EV – dynamiczna], [kWh EV] )
+		formatString: 0.000" zł/kWh"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 487580ac-7615-573f-aa5e-d65254f0fa5f
+
+	/// Energia pompy ciepła: roczne kWh × udział stopniogodzin (norma = średni rok 2016–2025).
+	measure 'kWh PC' = [PC Value] * SUM ( FactRynek[WspPC] )
+		formatString: #,##0" kWh"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: ffde6449-629d-5822-88e8-6bd184a688f0
+
+	measure 'Koszt PC – dynamiczna' =
+			VAR _pc = [PC Value]
+			VAR _m = [Marża Value]
+			RETURN
+			    _pc / 1000 * SUMX ( FactRynek, FactRynek[WspPC] * ( FactRynek[RCE] + _m ) )
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: c836119b-79f7-59c4-b1d7-1aac68b3224f
+
+	measure 'Koszt PC – G11' = [kWh PC] * [Cena G11 Value]
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 9ef3fd2c-68a8-53d7-969a-eafdd78fa25c
+
+	measure 'Koszt PC – G12' =
+			VAR _tania =
+			    CALCULATE (
+			        [kWh PC],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "tania"
+			    )
+			VAR _droga =
+			    CALCULATE (
+			        [kWh PC],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "droga"
+			    )
+			RETURN
+			    _tania * [Cena G12 noc Value] + _droga * [Cena G12 dzień Value]
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 345ae5dd-df50-5b0a-8404-a488096e0d79
+
+	measure 'Efektywna cena PC – dynamiczna (zł/kWh)' = DIVIDE ( [Koszt PC – dynamiczna], [kWh PC] )
+		formatString: 0.000" zł/kWh"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: e33671fb-9431-5e89-86e0-3d0634e6183c
+
+	measure 'Koszt sezonu grzewczego – dynamiczna' = CALCULATE ( [Koszt PC – dynamiczna], DimData[SezonGrzewczy] = TRUE () )
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: 7bd59212-6a0a-5865-af94-8daa1486e336
+
+	measure 'Koszt sezonu grzewczego – G11' = CALCULATE ( [Koszt PC – G11], DimData[SezonGrzewczy] = TRUE () )
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: ef3cb349-a5a2-5bd2-8a2b-e362bbe4a381
+
+	measure 'Koszt sezonu grzewczego – G12' = CALCULATE ( [Koszt PC – G12], DimData[SezonGrzewczy] = TRUE () )
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: a9719bbd-0110-55ba-b0cc-ea0ac54b349a
+
+	measure 'Koszt PC wybranej taryfy' =
+			SWITCH (
+			    SELECTEDVALUE ( Taryfy[Taryfa] ),
+			    "G11", [Koszt sezonu grzewczego – G11],
+			    "G12", [Koszt sezonu grzewczego – G12],
+			    "Dynamiczna", [Koszt sezonu grzewczego – dynamiczna]
+			)
+		formatString: #,##0" zł"
+		displayFolder: 5. EV i pompa ciepła
+		lineageTag: b912238d-60ae-51ef-953f-76c025a88478
+
+	/// Produkcja instalacji: kWp × krajowa generacja PV przeskalowana do 1000 kWh/kWp w 12 miesiącach.
+	measure 'PV produkcja (kWh)' = [PV Value] * SUM ( FactRynek[WspPV] )
+		formatString: #,##0" kWh"
+		displayFolder: 6. Prosument
+		lineageTag: 0f0555dc-0de4-581a-a524-94c594178dc9
+
+	/// Energia z PV zużyta od razu w domu (bilansowanie w kwadransie).
+	measure 'Autokonsumpcja (kWh)' =
+			VAR _z = [Zużycie Value]
+			VAR _ev = [EV Value]
+			VAR _pc = [PC Value]
+			VAR _tryb = [Tryb EV Value]
+			VAR _kwp = [PV Value]
+			RETURN
+			    SUMX (
+			        FactRynek,
+			        VAR _load =
+			            _z * FactRynek[WspProfil]
+			                + _ev * SWITCH ( _tryb, "Noc", FactRynek[WspEV_Noc], "Smart", FactRynek[WspEV_Smart], FactRynek[WspEV_Wieczor] )
+			                + _pc * FactRynek[WspPC]
+			        VAR _pv = _kwp * FactRynek[WspPV]
+			        RETURN
+			            MIN ( _load, _pv )
+			    )
+		formatString: #,##0" kWh"
+		displayFolder: 6. Prosument
+		lineageTag: 663e8c2b-709d-5dea-bc8a-4db4c45ae1e2
+
+	measure 'Eksport (kWh)' = [PV produkcja (kWh)] - [Autokonsumpcja (kWh)]
+		formatString: #,##0" kWh"
+		displayFolder: 6. Prosument
+		lineageTag: 78c5d068-6427-552b-86d4-75f606cade41
+
+	measure 'Pobór z sieci (kWh)' = [kWh łącznie] - [Autokonsumpcja (kWh)]
+		formatString: #,##0" kWh"
+		displayFolder: 6. Prosument
+		lineageTag: 36870c08-1137-553f-8a72-441b22b4282d
+
+	measure 'Autokonsumpcja %' = DIVIDE ( [Autokonsumpcja (kWh)], [PV produkcja (kWh)] )
+		formatString: 0.0%
+		displayFolder: 6. Prosument
+		lineageTag: 723d4d16-ecf3-5548-ab3a-e9decaf80bd9
+
+	measure 'Pokrycie zużycia z PV %' = DIVIDE ( [Autokonsumpcja (kWh)], [kWh łącznie] )
+		formatString: 0.0%
+		displayFolder: 6. Prosument
+		lineageTag: 28064c20-d4a0-577d-b04a-dae0bb0fa063
+
+	measure 'Wartość depozytu (zł)' =
+			-- net-billing: eksport wyceniany po RCE ze współczynnikiem 1,23; przy ujemnej RCE depozyt nie maleje (podłoga 0)
+			VAR _z = [Zużycie Value]
+			VAR _ev = [EV Value]
+			VAR _pc = [PC Value]
+			VAR _tryb = [Tryb EV Value]
+			VAR _kwp = [PV Value]
+			RETURN
+			    1.23
+			        * SUMX (
+			            FactRynek,
+			            VAR _load =
+			                _z * FactRynek[WspProfil]
+			                + _ev * SWITCH ( _tryb, "Noc", FactRynek[WspEV_Noc], "Smart", FactRynek[WspEV_Smart], FactRynek[WspEV_Wieczor] )
+			                + _pc * FactRynek[WspPC]
+			            VAR _pv = _kwp * FactRynek[WspPV]
+			            VAR _eksport = MAX ( _pv - _load, 0 )
+			            RETURN
+			                _eksport * MAX ( FactRynek[RCE], 0 ) / 1000
+			        )
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: dd26e10d-0738-5251-a34f-5bbdd28b6263
+
+	/// RCE ważona eksportem (z podłogą 0), bez współczynnika 1,23.
+	measure 'Średnia cena eksportu (zł/MWh)' = DIVIDE ( [Wartość depozytu (zł)] / 1.23, [Eksport (kWh)] ) * 1000
+		formatString: #,##0" zł/MWh"
+		displayFolder: 6. Prosument
+		lineageTag: 856bfec0-04b6-5488-83d3-6a7709329f0e
+
+	measure 'Koszt poboru – dynamiczna (zł)' =
+			VAR _z = [Zużycie Value]
+			VAR _ev = [EV Value]
+			VAR _pc = [PC Value]
+			VAR _tryb = [Tryb EV Value]
+			VAR _kwp = [PV Value]
+			VAR _m = [Marża Value]
+			RETURN
+			    SUMX (
+			        FactRynek,
+			        VAR _load =
+			            _z * FactRynek[WspProfil]
+			                + _ev * SWITCH ( _tryb, "Noc", FactRynek[WspEV_Noc], "Smart", FactRynek[WspEV_Smart], FactRynek[WspEV_Wieczor] )
+			                + _pc * FactRynek[WspPC]
+			        VAR _pv = _kwp * FactRynek[WspPV]
+			        RETURN
+			            MAX ( _load - _pv, 0 ) * ( FactRynek[RCE] + _m ) / 1000
+			    )
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: eb287afc-c510-5bef-bd90-770582e4a0f8
+
+	measure 'Koszt poboru – G11 (zł)' = [Pobór z sieci (kWh)] * [Cena G11 Value]
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: ef62c71b-70ac-56d5-b002-70b81469c770
+
+	measure 'Koszt poboru – G12 (zł)' =
+			VAR _tania =
+			    CALCULATE (
+			        [Pobór z sieci (kWh)],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "tania"
+			    )
+			VAR _droga =
+			    CALCULATE (
+			        [Pobór z sieci (kWh)],
+			        USERELATIONSHIP ( FactRynek[SlotZimowy], DimSlot[Slot] ),
+			        DimSlot[StrefaG12] = "droga"
+			    )
+			RETURN
+			    _tania * [Cena G12 noc Value] + _droga * [Cena G12 dzień Value]
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: de7ebe47-935d-56a2-bf2e-14b7d0d77929
+
+	/// Koszt energii pobranej z sieci minus wartość depozytu prosumenckiego.
+	measure 'Saldo energii – dynamiczna (zł)' = [Koszt poboru – dynamiczna (zł)] - [Wartość depozytu (zł)]
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: 9a11921e-9ce1-52d5-b112-51fbf86f11cf
+
+	measure 'Saldo energii – G11 (zł)' = [Koszt poboru – G11 (zł)] - [Wartość depozytu (zł)]
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: a8149d1b-0436-58d7-9f42-b3e62358866f
+
+	measure 'Saldo energii – G12 (zł)' = [Koszt poboru – G12 (zł)] - [Wartość depozytu (zł)]
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: 846f429e-b5f9-5e0c-bfc6-2e674310312b
+
+	measure 'Saldo wybranej taryfy (PV)' =
+			SWITCH (
+			    SELECTEDVALUE ( Taryfy[Taryfa] ),
+			    "G11", [Saldo energii – G11 (zł)],
+			    "G12", [Saldo energii – G12 (zł)],
+			    "Dynamiczna", [Saldo energii – dynamiczna (zł)]
+			)
+		formatString: #,##0" zł"
+		displayFolder: 6. Prosument
+		lineageTag: ebfd1c3f-8fc3-51d7-b7ce-de516953ea9f
+
+	/// Wniosek nr 1 – werdykt dla domyślnego domu.
+	measure Werdykt = ```
+			VAR _o = [Oszczędność vs G11]
+			RETURN
+			    "Przy " & FORMAT ( [Zużycie Value], "#,##0" ) & " kWh rocznie i marży "
+			        & [Marża Value] & " zł/MWh taryfa dynamiczna byłaby "
+			        & IF ( _o >= 0, "tańsza", "droższa" ) & " niż G11 o "
+			        & FORMAT ( ABS ( _o ), "#,##0" ) & " zł ("
+			        & FORMAT ( ABS ( [Oszczędność %] ), "0%" ) & ")." 
+			```
+		displayFolder: 7. Teksty
+		lineageTag: be140813-60ce-582c-a853-b5d7bbb92d31
+
+	measure 'Wniosek – marża' =
+			VAR _bep = [Marża graniczna (zł/MWh)]
+			VAR _m = [Marża Value]
+			RETURN
+			    IF (
+			        _bep > 0,
+			        "Taryfa dynamiczna wygrywa z G11, dopóki marża sprzedawcy nie przekracza "
+			            & FORMAT ( _bep, "#,##0" ) & " zł/MWh (" & FORMAT ( _bep / 10, "0.0" ) & " gr/kWh). Przy założonych "
+			            & _m & " zł/MWh "
+			            & IF (
+			                _bep >= _m,
+			                "zapas wynosi " & FORMAT ( _bep - _m, "#,##0" ) & " zł/MWh.",
+			                "brakuje " & FORMAT ( _m - _bep, "#,##0" ) & " zł/MWh."
+			            ),
+			        "Nawet przy zerowej marży taryfa dynamiczna nie wygrywa z G11 – profil zużycia trafia w drogie godziny."
+			    )
+		displayFolder: 7. Teksty
+		lineageTag: 3cba6c67-4999-5972-98fa-52cf7f32d11c
+
+	measure 'Wniosek – profil' = ```
+			VAR _sr = [Średnia RCE (zł/kWh)] * 100
+			VAR _wazona = [Średnia RCE ważona profilem (zł/MWh)] / 10
+			VAR _kara = _wazona - _sr
+			RETURN
+			    "Średnia RCE to " & FORMAT ( _sr, "0.0" ) & " gr/kWh, ale ważona profilem przeciętnego domu – "
+			        & FORMAT ( _wazona, "0.0" ) & " gr/kWh ("
+			        & IF ( _kara >= 0, "+", "" ) & FORMAT ( _kara, "0.0" ) & " gr/kWh), bo "
+			        & IF ( _kara >= 0, "najwięcej prądu zużywamy wieczorem, gdy jest drogi", "zużycie trafia w tańsze godziny" )
+			        & ". Średnia kłamie, decyduje profil." 
+			```
+		displayFolder: 7. Teksty
+		lineageTag: 46417ae1-dce4-5c6e-81a3-4e27b1dc9a37
+
+	/// Kafel „jeśli przesuniesz X% zużycia w tanie godziny, zyskasz Y zł”.
+	measure 'Wniosek – przesunięcie' = ```
+			"Jeśli przesuniesz " & FORMAT ( [Elastyczność Value], "0%" )
+			    & " zużycia w tanie godziny, zyskasz " & FORMAT ( [Zysk z przesunięcia], "#,##0" ) & " zł rocznie." 
+			```
+		displayFolder: 7. Teksty
+		lineageTag: 0d7f4588-e61d-55e5-930e-9cc1322d27c9
+
+	/// Opis domyślnego domu (strona Werdykt).
+	measure 'Założenia domu' = ```
+			"Profil Enea G11 · " & FORMAT ( [Zużycie Value], "#,##0" ) & " kWh/rok · G11 "
+			    & FORMAT ( [Cena G11 Value], "0.0000" ) & " zł/kWh · G12 " & FORMAT ( [Cena G12 dzień Value], "0.0000" ) & "/"
+			    & FORMAT ( [Cena G12 noc Value], "0.0000" ) & " zł/kWh · marża " & [Marża Value] & " zł/MWh · bez EV, pompy ciepła i PV" 
+			```
+		displayFolder: 7. Teksty
+		lineageTag: f1e8d636-2b62-5076-aa2b-5369e630811b
+
+	measure 'Tytuł – krzywa czułości' = ```
+			"Koszt roczny a marża sprzedawcy – próg opłacalności: "
+			    & FORMAT ( [Marża graniczna (zł/MWh)], "#,##0" ) & " zł/MWh" 
+			```
+		displayFolder: 7. Teksty
+		lineageTag: e1efd577-d497-57dd-b9e6-02233cc39244
+
+	measure 'Tytuł – najdroższy miesiąc' = "Najdroższy miesiąc w taryfie dynamicznej: " & [Najdroższy miesiąc – nazwa]
+		displayFolder: 7. Teksty
+		lineageTag: f83c3105-8104-516c-b39e-1dd02baee197
+
+	measure 'Opis – EV' = ```
+			"Auto: " & FORMAT ( [EV Value], "#,##0" ) & " kWh rocznie, marża " & [Marża Value]
+			    & " zł/MWh. Tryb Smart ładuje w 16 najtańszych kwadransach każdej doby." 
+			```
+		displayFolder: 7. Teksty
+		lineageTag: 9ab37cb1-8881-5ae1-8bbd-3ab4a5d10d6c
+
+	measure 'Okres analizy' =
+			VAR _od = MIN ( FactRynek[Data] )
+			VAR _do = MAX ( FactRynek[Data] )
+			RETURN
+			    IF ( NOT ISBLANK ( _od ), FORMAT ( _od, "d MMM yyyy" ) & " – " & FORMAT ( _do, "d MMM yyyy" ) )
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: 1dadd9c7-4be2-52e2-935b-5c5b556c37a8
+
+	measure 'Liczba miesięcy w okresie' = CALCULATE ( DISTINCTCOUNT ( DimData[RokMiesiąc] ), FactRynek )
+		formatString: #,##0
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: ad3e5a78-967d-53a0-86c4-795d0fb239cb
+
+	/// Kontrola okresu (12 pełnych miesięcy) i kompletności cen RCE.
+	measure 'Ostrzeżenie o okresie' =
+			VAR _n = [Liczba miesięcy w okresie]
+			VAR _bezCeny = [Kwadranse bez RCE]
+			VAR _okres =
+			    IF (
+			        _n <> 12,
+			        "Uwaga: wybrany okres obejmuje " & _n
+			            & " mies. Koszty roczne mają sens tylko dla 12 pełnych miesięcy – wybierz „Ostatnie 12 mies.”.",
+			        "Porównanie dla 12 pełnych miesięcy: " & [Okres analizy]
+			    )
+			RETURN
+			    _okres
+			        & IF (
+			            _bezCeny > 0,
+			            " Brak RCE w " & FORMAT ( _bezCeny, "#,##0" )
+			                & " kwadransach – koszt taryfy dynamicznej jest w nich zaniżony (liczona tylko marża)."
+			        )
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: 4a05cd4d-5502-5371-988e-9605a373d5ff
+
+	measure 'Liczba dób' = DISTINCTCOUNT ( FactRynek[Data] )
+		formatString: #,##0
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: a8733978-282f-50d2-86b0-b4c39016a288
+
+	measure 'Liczba kwadransów' = COUNTROWS ( FactRynek )
+		formatString: #,##0
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: f92b935a-073f-5893-bdd8-18bf045ad958
+
+	measure 'Kwadranse bez RCE' = CALCULATE ( COUNTROWS ( FactRynek ), ISBLANK ( FactRynek[RCE] ) ) + 0
+		formatString: #,##0
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: 7175ad75-edee-5f5f-81ad-0acc80fa66cd
+
+	/// Kwadranse, dla których brakowało pomiaru IMGW i użyto normy (miesiąc, godzina).
+	measure 'Udział temperatury uzupełnionej' =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( FactRynek ), FactRynek[TemperaturaUzupełniona] = TRUE () ),
+			    COUNTROWS ( FactRynek )
+			)
+		formatString: 0.0%
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: 5daab668-d208-5044-b9be-3f85441e321a
+
+	measure 'Dane PSE do' = "Dane PSE do " & FORMAT ( MAX ( FactRynek[Data] ), "d MMMM yyyy" )
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: f3082b45-76fd-5949-88c5-0f922fd35522
+
+	measure 'Ostatnia aktualizacja danych' =
+			VAR _t = LOOKUPVALUE ( InfoDane[Wartość], InfoDane[Klucz], "ostatnia_aktualizacja_utc" )
+			RETURN
+			    IF ( NOT ISBLANK ( _t ), "Ostatnia aktualizacja danych: " & _t & " UTC" )
+		displayFolder: 8. Okres i jakość danych
+		lineageTag: 255dd723-b997-5443-b232-6ceabdc357bb
+
+	/// Koszt dynamiczny przy marży z osi X (tabela OśMarży) – krzywa czułości.
+	measure 'Koszt – dynamiczna (oś marży)' =
+			VAR _x = SELECTEDVALUE ( OśMarży[Marża (oś)] )
+			RETURN
+			    IF ( NOT ISBLANK ( _x ), [Koszt – dynamiczna (bez marży)] + _x * [kWh łącznie] / 1000 )
+		formatString: #,##0" zł"
+		displayFolder: 9. Pomocnicze do wykresów
+		lineageTag: 768c2add-d0a5-5290-8446-94427ff4d105
+
+	measure 'Koszt – G11 (oś marży)' = IF ( HASONEVALUE ( OśMarży[Marża (oś)] ), [Koszt – G11] )
+		formatString: #,##0" zł"
+		displayFolder: 9. Pomocnicze do wykresów
+		lineageTag: 09720a6f-8a5b-512c-85e9-8535e93705fc
+
+	/// Znacznik w punkcie osi najbliższym marży granicznej.
+	measure 'Punkt opłacalności' =
+			VAR _x = SELECTEDVALUE ( OśMarży[Marża (oś)] )
+			VAR _bep = [Marża graniczna (zł/MWh)]
+			RETURN
+			    IF ( NOT ISBLANK ( _x ) && ABS ( _x - _bep ) <= 5, [Koszt – G11] )
+		formatString: #,##0" zł"
+		displayFolder: 9. Pomocnicze do wykresów
+		lineageTag: fa7cffd1-7b80-59c7-97ed-de7ab5aba343
+
+	column Pomocnicza
+		dataType: int64
+		isHidden
+		lineageTag: 7a7529f1-4c2e-573b-b7ea-7526e41505f7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Pomocnicza]
+
+		annotation SummarizationSetBy = User
+
+	partition Miary = calculated
+		mode: import
+		source = ROW ( "Pomocnicza", 0 )
+

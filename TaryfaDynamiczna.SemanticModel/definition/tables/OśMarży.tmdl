@@ -1,0 +1,18 @@
+/// Rozłączna oś X krzywej czułości koszt vs marża (niezależna od suwaka marży).
+table OśMarży
+	lineageTag: bfd7eb7b-e297-5e86-95f2-645ef843db9c
+
+	column 'Marża (oś)'
+		dataType: int64
+		formatString: #,##0" zł/MWh"
+		lineageTag: ab190b8d-5384-581a-a3d4-ea3310b5fd20
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Marża (oś)]
+
+		annotation SummarizationSetBy = User
+
+	partition OśMarży = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 300, 10 ), "Marża (oś)", [Value] )
+

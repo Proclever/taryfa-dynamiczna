@@ -1,0 +1,359 @@
+/// Repozytorium GitHub z katalogiem data/ w postaci login/nazwa (musi być publiczne).
+expression RepoGitHub = "Proclever/taryfa-dynamiczna" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: bd578b35-8286-5cf3-81e0-a2af224472ce
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Gałąź repozytorium z danymi.
+expression GalazGitHub = "main" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 41727277-d195-513b-bacd-fbbfda97871a
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Początek nocnej strefy taniej G12 (godzina wg czasu zimowego licznika).
+expression G12NocOd = 22 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 100e4dd9-7cea-5bdc-a0de-f01b1a1b38aa
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+/// Koniec nocnej strefy taniej G12.
+expression G12NocDo = 6 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: cffa2c3c-8de9-5aaf-b919-c7f6f870b904
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+/// Początek dziennej strefy taniej G12.
+expression G12DzienOd = 13 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 8cbabfc2-3a57-5df6-928b-e94538b02acc
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+/// Koniec dziennej strefy taniej G12.
+expression G12DzienDo = 15 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 2eb7fa7c-e19b-5c26-9843-f9d736a3904f
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+/// TRUE = strefy G12 liczone wg czasu zimowego (latem przesunięte o godzinę), jak w taryfie Enea Operator.
+expression LicznikWgCzasuZimowego = true meta [IsParameterQuery=true, Type="Logical", IsParameterQueryRequired=true]
+	lineageTag: 042d453b-8b00-5ca8-bf6e-0f9b0684714a
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Logical
+
+/// Próg temperatury dla stopniogodzin pompy ciepła [°C].
+expression ProgTemperaturyPC = 15 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 71403f3a-9c40-58e2-bb99-a3013650fc28
+	queryGroup: Parametry
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+/// Jedyne zapytanie sięgające do źródła: CSV z katalogu data/ repozytorium GitHub.
+expression DaneSurowe =
+		// JEDYNE zapytanie, które sięga do źródła danych (pliki CSV w repozytorium GitHub, katalog data/).
+		// Pozostałe zapytania tylko się do niego odwołują – dzięki temu zapora prywatności Power Query
+		// (Formula.Firewall) nie blokuje odświeżania w żadnej wersji Power BI Desktop ani w usłudze.
+		// Stały adres bazowy + RelativePath = odświeżanie w usłudze bez bramy i bez błędu „dynamic data source”.
+		let
+		    Plik = (sciezka as text) as table =>
+		        let
+		            Binarne = Web.Contents(
+		                "https://raw.githubusercontent.com",
+		                [RelativePath = RepoGitHub & "/" & GalazGitHub & "/data/" & sciezka]
+		            ),
+		            Csv = Csv.Document(Binarne, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv])
+		        in
+		            Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),
+		    ListaPlikow = Table.TransformColumnTypes(
+		        Plik("manifest.csv"),
+		        {{"typ", type text}, {"plik", type text}, {"wiersze", Int64.Type}, {"od", type date}, {"do", type date}},
+		        "en-US"
+		    ),
+		    Polacz = (typ as text) as table =>
+		        Table.Combine(List.Transform(Table.SelectRows(ListaPlikow, each [typ] = typ)[plik], Plik)),
+		    Wynik = [
+		        Manifest = ListaPlikow,
+		        Rynek = Table.Buffer(Polacz("market")),
+		        Pogoda = Table.Buffer(Polacz("pogoda")),
+		        Profil = Table.Buffer(Polacz("profil")),
+		        Info = Plik("aktualizacja.csv")
+		    ]
+		in
+		    Wynik
+	lineageTag: e1820c77-8410-53a9-bcb8-d7872d51c4af
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Record
+
+/// Lista plików danych.
+expression Manifest =
+		// Lista plików danych zapisana przez scripts/pobierz_dane.py (typ: market / pogoda / profil).
+		let
+		    Zrodlo = DaneSurowe[Manifest]
+		in
+		    Zrodlo
+	lineageTag: 34a2975a-9c27-5581-822b-5bab136e213c
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Granice okien: ostatnie i poprzednie 12 pełnych miesięcy.
+expression Okna =
+		// Granice okien analizy: „ostatnie 12 pełnych miesięcy” i 12 miesięcy wcześniejszych.
+		// Liczone od ostatniej doby z danymi PSE, więc same się przesuwają po każdym odświeżeniu.
+		let
+		    Rynek = Table.SelectRows(Manifest, each [typ] = "market"),
+		    PierwszaDoba = List.Min(Rynek[od]),
+		    OstatniaDoba = List.Max(Rynek[do]),
+		    KoniecPelnegoMiesiaca =
+		        if OstatniaDoba = Date.EndOfMonth(OstatniaDoba) then OstatniaDoba
+		        else Date.EndOfMonth(Date.AddMonths(OstatniaDoba, -1)),
+		    Ostatnie12Od = Date.StartOfMonth(Date.AddMonths(KoniecPelnegoMiesiaca, -11)),
+		    Poprzednie12Do = Date.AddDays(Ostatnie12Od, -1),
+		    Poprzednie12Od = Date.StartOfMonth(Date.AddMonths(KoniecPelnegoMiesiaca, -23)),
+		    Wynik = [
+		        PierwszaDoba = PierwszaDoba,
+		        OstatniaDoba = OstatniaDoba,
+		        Ostatnie12Od = Ostatnie12Od,
+		        Ostatnie12Do = KoniecPelnegoMiesiaca,
+		        Poprzednie12Od = Poprzednie12Od,
+		        Poprzednie12Do = Poprzednie12Do
+		    ]
+		in
+		    Wynik
+	lineageTag: 88b458e8-c596-5b90-8f2e-1de2dcddf4e5
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Record
+
+/// Okno analizy dla daty.
+expression fnOkno12M =
+		// Przypisuje dobę do okna analizy. Etykiety są stałe, więc domyślny wybór fragmentatora przetrwa odświeżenie.
+		(d as date) as text =>
+		    if d >= Okna[Ostatnie12Od] and d <= Okna[Ostatnie12Do] then "Ostatnie 12 mies."
+		    else if d >= Okna[Poprzednie12Od] and d <= Okna[Poprzednie12Do] then "Poprzednie 12 mies."
+		    else if d > Okna[Ostatnie12Do] then "Bieżący miesiąc"
+		    else "Wcześniej"
+	lineageTag: 2f54abba-9912-5bc4-ac0e-24cbf93b9d07
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+/// Dni ustawowo wolne od pracy w Polsce.
+expression Swieta =
+		// Polskie dni ustawowo wolne od pracy: daty stałe + święta ruchome liczone od Wielkanocy.
+		let
+		    Lata = {Date.Year(Okna[PierwszaDoba]) .. Date.Year(Okna[OstatniaDoba])},
+		    // Anonimowy algorytm gregoriański (Meeus/Jones/Butcher)
+		    Wielkanoc = (rok as number) as date =>
+		        let
+		            a = Number.Mod(rok, 19),
+		            b = Number.IntegerDivide(rok, 100),
+		            c = Number.Mod(rok, 100),
+		            d = Number.IntegerDivide(b, 4),
+		            e = Number.Mod(b, 4),
+		            f = Number.IntegerDivide(b + 8, 25),
+		            g = Number.IntegerDivide(b - f + 1, 3),
+		            h = Number.Mod(19 * a + b - d - g + 15, 30),
+		            i = Number.IntegerDivide(c, 4),
+		            k = Number.Mod(c, 4),
+		            l = Number.Mod(32 + 2 * e + 2 * i - h - k, 7),
+		            m = Number.IntegerDivide(a + 11 * h + 22 * l, 451),
+		            x = h + l - 7 * m + 114
+		        in
+		            #date(rok, Number.IntegerDivide(x, 31), Number.Mod(x, 31) + 1),
+		    SwietaRoku = (rok as number) as list =>
+		        let
+		            w = Wielkanoc(rok),
+		            Stale = {
+		                {#date(rok, 1, 1), "Nowy Rok"},
+		                {#date(rok, 1, 6), "Trzech Króli"},
+		                {w, "Wielkanoc"},
+		                {Date.AddDays(w, 1), "Poniedziałek Wielkanocny"},
+		                {#date(rok, 5, 1), "Święto Pracy"},
+		                {#date(rok, 5, 3), "Święto Konstytucji 3 Maja"},
+		                {Date.AddDays(w, 49), "Zielone Świątki"},
+		                {Date.AddDays(w, 60), "Boże Ciało"},
+		                {#date(rok, 8, 15), "Wniebowzięcie NMP"},
+		                {#date(rok, 11, 1), "Wszystkich Świętych"},
+		                {#date(rok, 11, 11), "Narodowe Święto Niepodległości"},
+		                {#date(rok, 12, 25), "Boże Narodzenie"},
+		                {#date(rok, 12, 26), "Drugi dzień Bożego Narodzenia"}
+		            },
+		            // Wigilia jest dniem wolnym od pracy od 2025 r.
+		            Wigilia = if rok >= 2025 then {{#date(rok, 12, 24), "Wigilia"}} else {}
+		        in
+		            Stale & Wigilia,
+		    Wiersze = List.Combine(List.Transform(Lata, SwietaRoku)),
+		    Tabela = Table.FromRows(Wiersze, type table [Data = date, NazwaSwieta = text])
+		in
+		    Tabela
+	lineageTag: 4662e85a-a43e-5745-8ecc-6a104544325c
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Dane PSE (kwadranse).
+expression RynekSurowy =
+		// Dane PSE z plików miesięcznych market/RRRR-MM.csv (siatka kwadransów doby lokalnej).
+		let
+		    Polaczone = DaneSurowe[Rynek],
+		    Puste = Table.ReplaceValue(Polaczone, "", null, Replacer.ReplaceValue, {"rce", "zapotrzebowanie", "pv", "wiatr"}),
+		    Typy = Table.TransformColumnTypes(
+		        Puste,
+		        {
+		            {"data", type date}, {"kwadrans", Int64.Type}, {"od_utc", type datetime}, {"od_lokalnie", type datetime},
+		            {"czas_letni", Int64.Type}, {"rce", type number}, {"zapotrzebowanie", type number},
+		            {"pv", type number}, {"wiatr", type number}
+		        },
+		        "en-US"
+		    ),
+		    Nazwy = Table.RenameColumns(
+		        Typy,
+		        {
+		            {"data", "Data"}, {"kwadrans", "Kwadrans"}, {"od_utc", "OdUTC"}, {"od_lokalnie", "Timestamp"},
+		            {"czas_letni", "CzasLetni"}, {"rce", "RCE"}, {"zapotrzebowanie", "Zapotrzebowanie"},
+		            {"pv", "PV"}, {"wiatr", "Wiatr"}
+		        }
+		    ),
+		    BezDuplikatow = Table.Distinct(Nazwy, {"OdUTC"})
+		in
+		    BezDuplikatow
+	lineageTag: 49a60d0f-1bc8-5e02-affd-aa63773d94e0
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Temperatura godzinowa IMGW (UTC).
+expression PogodaGodzinowa =
+		// Godzinowa temperatura IMGW (stacja synoptyczna, czas UTC) z wszystkich plików z manifestu.
+		let
+		    Polaczone = DaneSurowe[Pogoda],
+		    Puste = Table.ReplaceValue(Polaczone, "", null, Replacer.ReplaceValue, {"temp"}),
+		    Typy = Table.TransformColumnTypes(Puste, {{"czas_utc", type datetime}, {"temp", type number}}, "en-US"),
+		    Nazwy = Table.RenameColumns(Typy, {{"czas_utc", "GodzinaUTC"}, {"temp", "Temperatura"}}),
+		    BezDuplikatow = Table.Distinct(Nazwy, {"GodzinaUTC"})
+		in
+		    BezDuplikatow
+	lineageTag: 7652d85d-94dd-580a-a069-e762a10f414d
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Norma temperatury (miesiąc, godzina UTC).
+expression PogodaKlimatologia =
+		// Średnia temperatura dla (miesiąc, godzina UTC) – uzupełnia luki w pomiarach i ostatnie tygodnie,
+		// których IMGW jeszcze nie opublikował w archiwum.
+		let
+		    Pomiary = Table.SelectRows(PogodaGodzinowa, each [Temperatura] <> null),
+		    Klucze = Table.AddColumn(
+		        Table.AddColumn(Pomiary, "Miesiąc", each Date.Month([GodzinaUTC]), Int64.Type),
+		        "GodzinaDoby", each Time.Hour([GodzinaUTC]), Int64.Type),
+		    Srednie = Table.Group(Klucze, {"Miesiąc", "GodzinaDoby"}, {{"TemperaturaNorma", each List.Average([Temperatura]), type number}})
+		in
+		    Srednie
+	lineageTag: e1f0b361-b5c7-5bc6-9c1b-9bc4f4918a9d
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Roczne stopniogodziny w typowym roku.
+expression StopniogodzinyNorma =
+		// Roczna suma stopniogodzin poniżej progu (ProgTemperaturyPC) w typowym roku = średnia z pełnych lat IMGW.
+		// Dzięki temu WspPC sumuje się do 1 w przeciętnym roku, a mroźny rok daje pompie ciepła więcej niż 100%.
+		let
+		    Z_klimatologia = Table.NestedJoin(
+		        Table.AddColumn(
+		            Table.AddColumn(PogodaGodzinowa, "Miesiąc", each Date.Month([GodzinaUTC]), Int64.Type),
+		            "GodzinaDoby", each Time.Hour([GodzinaUTC]), Int64.Type),
+		        {"Miesiąc", "GodzinaDoby"}, PogodaKlimatologia, {"Miesiąc", "GodzinaDoby"}, "K", JoinKind.LeftOuter),
+		    Temp = Table.AddColumn(Z_klimatologia, "T", each
+		        if [Temperatura] <> null then [Temperatura]
+		        else if Table.IsEmpty([K]) then null else [K]{0}[TemperaturaNorma], type nullable number),
+		    Stopniogodziny = Table.AddColumn(Temp, "DH", each if [T] = null then 0 else List.Max({0, ProgTemperaturyPC - [T]}), type number),
+		    Lata = Table.Group(
+		        Table.AddColumn(Stopniogodziny, "Rok", each Date.Year([GodzinaUTC]), Int64.Type),
+		        {"Rok"},
+		        {{"Godzin", each Table.RowCount(_), Int64.Type},
+		         {"Pomiarow", each List.Count(List.RemoveNulls([Temperatura])), Int64.Type},
+		         {"DH", each List.Sum([DH]), type number}}),
+		    // pełny rok = co najmniej 8000 godzin w pliku i 95% z nich z pomiarem
+		    Pelne = Table.SelectRows(Lata, each [Godzin] >= 8000 and [Pomiarow] >= 0.95 * [Godzin]),
+		    Norma =
+		        if Table.RowCount(Pelne) > 0 then List.Average(Pelne[DH])
+		        // awaryjnie: suma z dostępnych godzin przeskalowana do 8760 h
+		        else List.Sum(Lata[DH]) * 8760 / List.Max({1, List.Sum(Lata[Godzin])})
+		in
+		    Norma
+	lineageTag: 510f5c92-ce42-5b09-a17c-6c19c1c43bc0
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+/// Standardowy profil G11 Enea, znormalizowany do 1 w roku.
+expression ProfilOSD =
+		// Standardowy profil G11 (Enea Operator) w slotach zegarowych; normalizacja: suma w roku = 1.
+		let
+		    Polaczone = DaneSurowe[Profil],
+		    Typy = Table.TransformColumnTypes(Polaczone, {{"data", type date}, {"slot", Int64.Type}, {"wartosc", type number}, {"zrodlo", type text}}, "en-US"),
+		    // jedna wartość na (doba, slot) – w dobie jesiennej zmiany czasu sumujemy oba wystąpienia 02:00–02:45
+		    Unikalne = Table.Group(Typy, {"data", "slot"}, {
+		        {"wartosc", each List.Sum([wartosc]), type number},
+		        {"zrodlo", each List.First([zrodlo]), type text}}),
+		    ZRokiem = Table.AddColumn(Unikalne, "Rok", each Date.Year([data]), Int64.Type),
+		    SumyLat = Table.Group(ZRokiem, {"Rok"}, {{"SumaRoku", each List.Sum([wartosc]), type number}}),
+		    Polacz = Table.NestedJoin(ZRokiem, {"Rok"}, SumyLat, {"Rok"}, "S", JoinKind.Inner),
+		    Rozwin = Table.ExpandTableColumn(Polacz, "S", {"SumaRoku"}),
+		    Udzial = Table.AddColumn(Rozwin, "UdzialProfilu", each if [SumaRoku] = 0 then 0 else [wartosc] / [SumaRoku], type number),
+		    Wynik = Table.SelectColumns(
+		        Table.RenameColumns(Udzial, {{"data", "Data"}, {"slot", "Slot"}, {"zrodlo", "ZrodloProfilu"}}),
+		        {"Data", "Slot", "UdzialProfilu", "ZrodloProfilu"})
+		in
+		    Wynik
+	lineageTag: 173f6678-4dab-5a01-8db5-0e4cd5dd84a7
+	queryGroup: Pomocnicze
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,13 @@
+relationship 8d310dec-5ae7-5a9f-931a-c03ef72ab5ab
+	fromColumn: FactRynek.Data
+	toColumn: DimData.Data
+
+relationship 1afaa87f-b374-558b-b7b5-aa3f3ea576f5
+	fromColumn: FactRynek.Slot
+	toColumn: DimSlot.Slot
+
+relationship ef098336-5203-5c74-91a0-ac61e60f664b
+	isActive: false
+	fromColumn: FactRynek.SlotZimowy
+	toColumn: DimSlot.Slot
+

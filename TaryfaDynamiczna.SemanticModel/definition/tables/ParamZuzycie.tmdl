@@ -1,0 +1,27 @@
+/// Roczne zużycie domu bez EV i pompy ciepła [kWh/rok].
+table ParamZuzycie
+	lineageTag: 9821d247-d32a-5f9e-8177-acddd2ade080
+
+	/// Wartość parametru (domyślnie 3000).
+	measure 'Zużycie Value' = SELECTEDVALUE ( ParamZuzycie[Zużycie], 3000 )
+		formatString: #,##0" kWh"
+		lineageTag: acbb8950-05c8-501b-9297-effba2962714
+
+	column Zużycie
+		dataType: int64
+		formatString: #,##0" kWh"
+		lineageTag: ce23c11b-d225-5584-8de7-91e6b4dfe14a
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamZuzycie = calculated
+		mode: import
+		source = GENERATESERIES ( 500, 10000, 100 )
+

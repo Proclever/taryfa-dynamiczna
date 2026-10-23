@@ -1,0 +1,52 @@
+/// Tryb ładowania EV: Wieczór (18–22), Noc (23–6), Smart (16 najtańszych kwadransów doby).
+table ParamTrybEV
+	lineageTag: f0c45a9d-aa9e-5827-b80e-1009b8bdaf0b
+
+	/// Wybrany tryb ładowania (domyślnie Wieczór).
+	measure 'Tryb EV Value' = SELECTEDVALUE ( ParamTrybEV[Tryb EV], "Wieczór" )
+		lineageTag: 87089c55-3991-565d-9f4a-83c5e788227e
+
+	column 'Tryb EV'
+		dataType: string
+		lineageTag: 43617c05-d5f2-5bb1-aa04-113aa53cba3b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Tryb EV]
+		sortByColumn: Kolejność
+
+		annotation SummarizationSetBy = User
+
+	column Opis
+		dataType: string
+		lineageTag: ddcce056-73c2-56d1-83c4-170f7639e0a9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Opis]
+
+		annotation SummarizationSetBy = User
+
+	column Kolejność
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0a2415f9-f3c9-5da6-affb-03403a823811
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Kolejność]
+
+		annotation SummarizationSetBy = User
+
+	partition ParamTrybEV = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Tryb EV", STRING,
+				    "Opis", STRING,
+				    "Kolejność", INTEGER,
+				    {
+				        { "Wieczór", "ładowanie 18:00–22:00", 1 },
+				        { "Noc", "ładowanie 23:00–6:00", 2 },
+				        { "Smart", "16 najtańszych kwadransów doby", 3 }
+				    }
+				)
+

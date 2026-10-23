@@ -1,0 +1,27 @@
+/// Roczne zużycie energii przez pompę ciepła w typowym roku [kWh/rok].
+table ParamPC
+	lineageTag: f3c4d3a6-d506-50da-bb11-40b36d16b2a5
+
+	/// Wartość parametru (domyślnie 0).
+	measure 'PC Value' = SELECTEDVALUE ( ParamPC[PC], 0 )
+		formatString: #,##0" kWh"
+		lineageTag: f5fec030-c281-5d69-bd65-e4dca0dc78fc
+
+	column PC
+		dataType: int64
+		formatString: #,##0" kWh"
+		lineageTag: 3c3daf15-8508-5f2a-91a1-f401bb170a16
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamPC = calculated
+		mode: import
+		source = GENERATESERIES ( 0, 12000, 100 )
+

@@ -1,0 +1,35 @@
+/// Metadane aktualizacji danych.
+table InfoDane
+	isHidden
+	lineageTag: a04684a0-76e0-50eb-bd29-04a0a924b832
+
+	column Klucz
+		dataType: string
+		lineageTag: 4b283a41-5e3e-53b3-84b1-ecfbf00f85fc
+		summarizeBy: none
+		sourceColumn: Klucz
+
+		annotation SummarizationSetBy = User
+
+	column Wartość
+		dataType: string
+		lineageTag: 6eef1e3d-38e4-54a9-9c4b-63df16f84787
+		summarizeBy: none
+		sourceColumn: Wartość
+
+		annotation SummarizationSetBy = User
+
+	partition InfoDane = m
+		mode: import
+		queryGroup: 'Tabele modelu'
+		source =
+				// Metadane ostatniej aktualizacji danych (zapisuje je scripts/pobierz_dane.py).
+				let
+				    Zrodlo = DaneSurowe[Info],
+				    Typy = Table.TransformColumnTypes(Zrodlo, {{"klucz", type text}, {"wartosc", type text}}, "en-US"),
+				    Nazwy = Table.RenameColumns(Typy, {{"klucz", "Klucz"}, {"wartosc", "Wartość"}})
+				in
+				    Nazwy
+
+	annotation PBI_ResultType = Table
+

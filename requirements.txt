@@ -1,0 +1,7 @@
+# Pobieranie danych (scripts/pobierz_dane.py)
+requests>=2.31
+openpyxl>=3.1
+tzdata>=2024.1        # strefy czasowe dla zoneinfo na Windows
+# Model referencyjny i testy (opcjonalnie)
+pandas>=2.1
+pytest>=8.0

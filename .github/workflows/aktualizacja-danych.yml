@@ -1,0 +1,64 @@
+name: Aktualizacja danych
+
+on:
+  schedule:
+    - cron: "17 6 * * *"        # codziennie ok. 8:17 czasu polskiego (UTC+2 latem)
+  workflow_dispatch:
+    inputs:
+      od:
+        description: "Pierwsza doba PSE do (ponownego) pobrania, RRRR-MM-DD (puste = przyrostowo)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aktualizacja-danych
+  cancel-in-progress: false
+
+jobs:
+  dane:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalacja zależności
+        run: pip install -r requirements.txt
+
+      - name: Testy pipeline'u
+        run: python -m pytest -q tests
+
+      - name: Pobranie danych (PSE, profil OSD, IMGW)
+        id: pobranie
+        env:
+          OD: ${{ github.event.inputs.od }}
+        run: |
+          if [ -n "$OD" ]; then
+            # ponowne pobranie PSE od wskazanej doby (także dób kompletnych)
+            python scripts/pobierz_dane.py --od "$OD" --wymus pse
+          else
+            python scripts/pobierz_dane.py
+          fi
+
+      # Commit także wtedy, gdy jedno ze źródeł zawiodło (skrypt zapisuje to, co pobrał, i kończy się kodem 1) –
+      # przebieg i tak zostaje oznaczony jako nieudany, więc GitHub wyśle powiadomienie.
+      - name: Commit nowych danych
+        if: ${{ !cancelled() && steps.pobranie.outcome != 'skipped' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "Brak zmian w danych."
+          else
+            git commit -m "Dane: aktualizacja $(date -u +%Y-%m-%d)"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

@@ -1,0 +1,256 @@
+/// Kalendarz z typem dnia, sezonem grzewczym i oknami analizy.
+table DimData
+	lineageTag: 34bb4a5f-3549-5307-8da2-367f85cde1fd
+	dataCategory: Time
+
+	column Data
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 5813ccb0-b6c8-58ae-a03d-05053a839428
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = User
+
+	column NazwaŚwięta
+		dataType: string
+		lineageTag: ccb3b23d-77cc-5560-8c2b-88c7bfd567ab
+		summarizeBy: none
+		sourceColumn: NazwaŚwięta
+
+		annotation SummarizationSetBy = User
+
+	column Rok
+		dataType: int64
+		formatString: 0
+		lineageTag: 97d7f31e-967c-5610-8fff-9f76aa613a7e
+		summarizeBy: none
+		sourceColumn: Rok
+
+		annotation SummarizationSetBy = User
+
+	column Miesiąc
+		dataType: int64
+		formatString: 0
+		lineageTag: f568e2fd-430a-5fb2-8b6a-1e18e3150fff
+		summarizeBy: none
+		sourceColumn: Miesiąc
+
+		annotation SummarizationSetBy = User
+
+	column MiesiącNazwa
+		dataType: string
+		lineageTag: eb357cef-092e-5b37-a7d6-b78961959b3b
+		summarizeBy: none
+		sourceColumn: MiesiącNazwa
+		sortByColumn: Miesiąc
+
+		annotation SummarizationSetBy = User
+
+	column RokMiesiąc
+		dataType: string
+		lineageTag: 3dcdddf8-233a-55c3-8f5f-b3b38c003833
+		summarizeBy: none
+		sourceColumn: RokMiesiąc
+		sortByColumn: RokMiesiącSort
+
+		annotation SummarizationSetBy = User
+
+	column RokMiesiącSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e2f80333-0a55-5b1d-af8c-7f1395ff82c0
+		summarizeBy: none
+		sourceColumn: RokMiesiącSort
+
+		annotation SummarizationSetBy = User
+
+	/// Etykieta osi, np. „paź 25”.
+	column MiesiącRok
+		dataType: string
+		lineageTag: e101ca55-3a3a-5f5c-bf48-03d8e1423453
+		summarizeBy: none
+		sourceColumn: MiesiącRok
+		sortByColumn: RokMiesiącSort
+
+		annotation SummarizationSetBy = User
+
+	column PoczątekMiesiąca
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 2473a777-2a22-529b-b642-3e0d74550d7f
+		summarizeBy: none
+		sourceColumn: PoczątekMiesiąca
+
+		annotation SummarizationSetBy = User
+
+	column DzieńTygodniaNr
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a53e8430-8a24-582d-878f-153c10b3399c
+		summarizeBy: none
+		sourceColumn: DzieńTygodniaNr
+
+		annotation SummarizationSetBy = User
+
+	column DzieńTygodnia
+		dataType: string
+		lineageTag: ab407275-fa38-5886-b69d-04cb63b537d1
+		summarizeBy: none
+		sourceColumn: DzieńTygodnia
+		sortByColumn: DzieńTygodniaNr
+
+		annotation SummarizationSetBy = User
+
+	column CzyŚwięto
+		dataType: boolean
+		lineageTag: 77254ca7-2e73-5ba9-99c6-17ed7d782431
+		summarizeBy: none
+		sourceColumn: CzyŚwięto
+
+		annotation SummarizationSetBy = User
+
+	/// roboczy / sobota / niedziela lub święto
+	column TypDnia
+		dataType: string
+		lineageTag: 62dc8766-41c2-5a76-b24f-dc479cae2788
+		summarizeBy: none
+		sourceColumn: TypDnia
+		sortByColumn: TypDniaSort
+
+		annotation SummarizationSetBy = User
+
+	column TypDniaSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8ee3d10e-4fc4-5afc-b28d-21a3adc5e49a
+		summarizeBy: none
+		sourceColumn: TypDniaSort
+
+		annotation SummarizationSetBy = User
+
+	/// dzień roboczy / weekend lub święto
+	column RodzajDnia
+		dataType: string
+		lineageTag: 5abc537c-01d9-5a1f-91aa-64caa00451d4
+		summarizeBy: none
+		sourceColumn: RodzajDnia
+
+		annotation SummarizationSetBy = User
+
+	/// Październik–kwiecień.
+	column SezonGrzewczy
+		dataType: boolean
+		lineageTag: 7185b7e2-8974-5363-ab5e-59cfaa9a16a8
+		summarizeBy: none
+		sourceColumn: SezonGrzewczy
+
+		annotation SummarizationSetBy = User
+
+	column SezonGrzewczyEtykieta
+		dataType: string
+		lineageTag: 80726093-48a9-5867-afe7-a45f90d6e37a
+		summarizeBy: none
+		sourceColumn: SezonGrzewczyEtykieta
+
+		annotation SummarizationSetBy = User
+
+	/// Ostatnie 12 pełnych miesięcy / poprzednie 12 / bieżący miesiąc / wcześniej – liczone przy odświeżeniu.
+	column Okno12M
+		dataType: string
+		lineageTag: 196da143-7267-5096-9f43-6ccfa94a9e97
+		summarizeBy: none
+		sourceColumn: Okno12M
+		sortByColumn: OknoSort
+
+		annotation SummarizationSetBy = User
+
+	column OknoSort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cb54becf-846d-54b3-9be1-31ab78cb0cad
+		summarizeBy: none
+		sourceColumn: OknoSort
+
+		annotation SummarizationSetBy = User
+
+	column Granulacja
+		dataType: string
+		lineageTag: b17aada3-1f00-5669-ac57-6a20768ec041
+		summarizeBy: none
+		sourceColumn: Granulacja
+
+		annotation SummarizationSetBy = User
+
+	/// Średnia dobowa temperatura (IMGW).
+	column 'Temperatura średnia' = CALCULATE ( AVERAGE ( FactRynek[Temperatura] ) )
+		dataType: double
+		formatString: 0.0" °C"
+		lineageTag: 12c2fc1e-41a0-503b-b83a-e39521208cc8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+	/// 92 / 96 / 100 – doby zmiany czasu mają inną liczbę kwadransów.
+	column 'Kwadransów w dobie' = CALCULATE ( COUNTROWS ( FactRynek ) )
+		dataType: int64
+		formatString: 0
+		lineageTag: 5ca74dcd-ccc4-584a-96e9-1d3e369a943e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+	partition DimData = m
+		mode: import
+		queryGroup: 'Tabele modelu'
+		source =
+				// Kalendarz: typ dnia (roboczy / sobota / niedziela lub święto), miesiące, sezon grzewczy, okna analizy.
+				let
+				    Od = Okna[PierwszaDoba],
+				    Do = Okna[OstatniaDoba],
+				    Daty = List.Dates(Od, Duration.Days(Do - Od) + 1, #duration(1, 0, 0, 0)),
+				    Tabela = Table.FromList(Daty, Splitter.SplitByNothing(), type table [Data = date]),
+				    MiesiaceKrotkie = {"sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"},
+				    DniTygodnia = {"pon", "wt", "śr", "czw", "pt", "sob", "nd"},
+				    ZSwietem = Table.NestedJoin(Tabela, {"Data"}, Swieta, {"Data"}, "Sw", JoinKind.LeftOuter),
+				    NazwaSwieta = Table.AddColumn(ZSwietem, "NazwaŚwięta", each if Table.IsEmpty([Sw]) then null else [Sw]{0}[NazwaSwieta], type nullable text),
+				    BezSw = Table.RemoveColumns(NazwaSwieta, {"Sw"}),
+				    Rok = Table.AddColumn(BezSw, "Rok", each Date.Year([Data]), Int64.Type),
+				    Miesiac = Table.AddColumn(Rok, "Miesiąc", each Date.Month([Data]), Int64.Type),
+				    MiesiacNazwa = Table.AddColumn(Miesiac, "MiesiącNazwa", each MiesiaceKrotkie{[Miesiąc] - 1}, type text),
+				    RokMiesiac = Table.AddColumn(MiesiacNazwa, "RokMiesiąc", each Text.From([Rok]) & "-" & Text.PadStart(Text.From([Miesiąc]), 2, "0"), type text),
+				    RokMiesiacSort = Table.AddColumn(RokMiesiac, "RokMiesiącSort", each [Rok] * 100 + [Miesiąc], Int64.Type),
+				    Etykieta = Table.AddColumn(RokMiesiacSort, "MiesiącRok", each [MiesiącNazwa] & " " & Text.End(Text.From([Rok]), 2), type text),
+				    Poczatek = Table.AddColumn(Etykieta, "PoczątekMiesiąca", each Date.StartOfMonth([Data]), type date),
+				    DzienNr = Table.AddColumn(Poczatek, "DzieńTygodniaNr", each Date.DayOfWeek([Data], Day.Monday) + 1, Int64.Type),
+				    DzienNazwa = Table.AddColumn(DzienNr, "DzieńTygodnia", each DniTygodnia{[DzieńTygodniaNr] - 1}, type text),
+				    CzySwieto = Table.AddColumn(DzienNazwa, "CzyŚwięto", each [NazwaŚwięta] <> null, type logical),
+				    TypDnia = Table.AddColumn(CzySwieto, "TypDnia", each
+				        if [CzyŚwięto] or [DzieńTygodniaNr] = 7 then "niedziela lub święto"
+				        else if [DzieńTygodniaNr] = 6 then "sobota"
+				        else "roboczy", type text),
+				    TypDniaSort = Table.AddColumn(TypDnia, "TypDniaSort", each
+				        if [TypDnia] = "roboczy" then 1 else if [TypDnia] = "sobota" then 2 else 3, Int64.Type),
+				    RodzajDnia = Table.AddColumn(TypDniaSort, "RodzajDnia", each if [TypDnia] = "roboczy" then "dzień roboczy" else "weekend lub święto", type text),
+				    Sezon = Table.AddColumn(RodzajDnia, "SezonGrzewczy", each List.Contains({10, 11, 12, 1, 2, 3, 4}, [Miesiąc]), type logical),
+				    SezonEtykieta = Table.AddColumn(Sezon, "SezonGrzewczyEtykieta", each
+				        if not [SezonGrzewczy] then "poza sezonem"
+				        else
+				            let r0 = if [Miesiąc] >= 10 then [Rok] else [Rok] - 1
+				            in Text.From(r0) & "/" & Text.End(Text.From(r0 + 1), 2), type text),
+				    Okno = Table.AddColumn(SezonEtykieta, "Okno12M", each fnOkno12M([Data]), type text),
+				    OknoSort = Table.AddColumn(Okno, "OknoSort", each
+				        if [Okno12M] = "Ostatnie 12 mies." then 1
+				        else if [Okno12M] = "Poprzednie 12 mies." then 2
+				        else if [Okno12M] = "Bieżący miesiąc" then 3 else 4, Int64.Type),
+				    Granulacja = Table.AddColumn(OknoSort, "Granulacja", each if [Data] < #date(2025, 10, 1) then "1 h" else "15 min", type text)
+				in
+				    Granulacja
+
+	annotation PBI_ResultType = Table
+

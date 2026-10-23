@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Czy taryfa dynamiczna opłaca się Twojemu domowi"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "552040cd-43f1-5a34-b6ee-f4935762937c"
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "p7_zrodla",
+  "position": {
+    "x": 16,
+    "y": 84,
+    "z": 2000,
+    "height": 620,
+    "width": 616,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Źródła danych",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "12pt",
+                      "color": "#0B0B0B",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "PSE – API v2 (api.raporty.pse.pl), dane od 14.06.2024: raport rce-pln (rynkowa cena energii RCE, zł/MWh), kse-load (zapotrzebowanie KSE) i his-wlk-cal (generacja PV i wiatrowa). RCE do 30.09.2025 było godzinowe (wartość godziny w czterech kwadransach), od 1.10.2025 zmienia się co 15 minut.",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "IMGW-PIB (danepubliczne.imgw.pl) – godzinowa temperatura ze stacji synoptycznej Poznań-Ławica. Luki i ostatnie tygodnie, których IMGW nie opublikował jeszcze w archiwum, uzupełnia norma (miesiąc × godzina). Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy; dane IMGW-PIB zostały przetworzone.",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Enea Operator – standardowy profil zużycia G11 (załącznik nr 4 do IRiESD) jako „przeciętny dom” oraz godziny stref G12 z taryfy OSD: strefa tania 22–6 i 13–15 według czasu zimowego (liczniki nie przestawiają się latem).",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Ceny domyślne – taryfa Enea dla grupy G od 1.01.2026 (netto, bez VAT i akcyzy): G11 0,4980 zł/kWh; G12 0,5779 / 0,3369 zł/kWh. Marża dynamiczna 87 zł/MWh – składnik kosztowo-marżowy z cennika Enea „Ceny Dynamiczne” (III kw. 2025). Wpisz własne stawki z faktury na stronie „Twój dom”.",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Metoda",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "12pt",
+                      "color": "#0B0B0B",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Zużycie domu = roczne kWh × udział każdego kwadransa według profilu OSD (profil znormalizowany w każdych 12 miesiącach analizy, więc zużycie w oknie = wpisane kWh). Auto: Wieczór 18–22, Noc 23–6 albo Smart – 16 najtańszych kwadransów każdej doby. Pompa ciepła: stopniogodziny poniżej 15 °C, norma = średni rok 2016–2025. PV: krajowa generacja PV przeskalowana do 1000 kWh/kWp w każdych 12 miesiącach.",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Taryfa dynamiczna = suma po kwadransach: kWh × (RCE + marża). G11 i G12 = kWh × cena strefy. Porównujemy wyłącznie 12 pełnych miesięcy (domyślnie ostatnich); doby zmiany czasu mają 92 lub 100 kwadransów.",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Dane odświeża codziennie GitHub Actions (skrypt w Pythonie zapisuje CSV w repozytorium), a Power BI wczytuje je bez bramy prosto z GitHuba.",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "9pt",
+                      "color": "#52514E"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

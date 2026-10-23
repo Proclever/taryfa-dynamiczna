@@ -1,0 +1,138 @@
+/// 96 kwadransów doby ze strefami G12/G12w i częścią doby.
+table DimSlot
+	lineageTag: 5dd6f562-db42-5d25-b83c-216a8ef3611f
+
+	column Slot
+		dataType: int64
+		formatString: 0
+		lineageTag: 96598b03-ed74-5644-92aa-46d8ee46ac87
+		summarizeBy: none
+		sourceColumn: Slot
+
+		annotation SummarizationSetBy = User
+
+	column Godzina
+		dataType: int64
+		formatString: 0
+		lineageTag: d88c448d-d97b-5583-86b7-3130a446d2c0
+		summarizeBy: none
+		sourceColumn: Godzina
+
+		annotation SummarizationSetBy = User
+
+	column Minuta
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ab5f0d05-01b0-57b7-bde1-f0ed460d6ed5
+		summarizeBy: none
+		sourceColumn: Minuta
+
+		annotation SummarizationSetBy = User
+
+	/// Początek kwadransa, np. 18:15.
+	column Etykieta
+		dataType: string
+		lineageTag: d478052d-56c0-549f-9b63-4b57c030778c
+		summarizeBy: none
+		sourceColumn: Etykieta
+		sortByColumn: Slot
+
+		annotation SummarizationSetBy = User
+
+	/// Pełna godzina, np. 18:00.
+	column EtykietaGodziny
+		dataType: string
+		lineageTag: c3940dd4-6f8f-5621-b02f-82f4d9f10a0b
+		summarizeBy: none
+		sourceColumn: EtykietaGodziny
+		sortByColumn: Godzina
+
+		annotation SummarizationSetBy = User
+
+	column EtykietaZakres
+		dataType: string
+		lineageTag: ab4550a2-c2d3-55a9-9c14-751ae7e38a0d
+		summarizeBy: none
+		sourceColumn: EtykietaZakres
+		sortByColumn: Slot
+
+		annotation SummarizationSetBy = User
+
+	/// tania / droga – wg czasu zimowego licznika (parametry G12...).
+	column StrefaG12
+		dataType: string
+		lineageTag: e7c9f897-8acf-5b9a-b593-8877f81fe947
+		summarizeBy: none
+		sourceColumn: StrefaG12
+
+		annotation SummarizationSetBy = User
+
+	/// Dni robocze; weekendy i święta w G12w są w całości tanie.
+	column StrefaG12w
+		dataType: string
+		lineageTag: 02421dd7-1df6-514d-a127-4fb0e145d6e8
+		summarizeBy: none
+		sourceColumn: StrefaG12w
+
+		annotation SummarizationSetBy = User
+
+	column CzęśćDoby
+		dataType: string
+		lineageTag: da1ca34c-1559-5952-a742-fe868b171bd1
+		summarizeBy: none
+		sourceColumn: CzęśćDoby
+		sortByColumn: CzęśćDobySort
+
+		annotation SummarizationSetBy = User
+
+	column CzęśćDobySort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c2b8ba29-c60c-5965-855d-8b5571b694ba
+		summarizeBy: none
+		sourceColumn: CzęśćDobySort
+
+		annotation SummarizationSetBy = User
+
+	partition DimSlot = m
+		mode: import
+		queryGroup: 'Tabele modelu'
+		source =
+				// 96 kwadransów doby. Strefy G12/G12w trzymamy tutaj (a nie w miarach), bo godziny stref różnią się między OSD.
+				// Domyślnie Enea Operator: strefa tania 22–6 i 13–15 (parametry G12...). Strefę dla danego kwadransa
+				// FactRynek bierze po kolumnie SlotZimowy (liczniki Enei chodzą wg czasu zimowego – IRiESD/taryfa pkt 2.2.12).
+				let
+				    WPrzedziale = (g as number, od as number, do as number) as logical =>
+				        if od <= do then g >= od and g < do else g >= od or g < do,
+				    Tabela = Table.FromList(List.Numbers(1, 96), Splitter.SplitByNothing(), type table [Slot = Int64.Type]),
+				    Godzina = Table.AddColumn(Tabela, "Godzina", each Number.IntegerDivide([Slot] - 1, 4), Int64.Type),
+				    Minuta = Table.AddColumn(Godzina, "Minuta", each Number.Mod([Slot] - 1, 4) * 15, Int64.Type),
+				    Etykieta = Table.AddColumn(Minuta, "Etykieta", each
+				        Text.PadStart(Text.From([Godzina]), 2, "0") & ":" & Text.PadStart(Text.From([Minuta]), 2, "0"), type text),
+				    EtykietaGodziny = Table.AddColumn(Etykieta, "EtykietaGodziny", each Text.PadStart(Text.From([Godzina]), 2, "0") & ":00", type text),
+				    Zakres = Table.AddColumn(EtykietaGodziny, "EtykietaZakres", each
+				        let
+				            k = [Slot] * 15,
+				            gk = Number.Mod(Number.IntegerDivide(k, 60), 24),
+				            mk = Number.Mod(k, 60)
+				        in
+				            [Etykieta] & "–" & Text.PadStart(Text.From(gk), 2, "0") & ":" & Text.PadStart(Text.From(mk), 2, "0"), type text),
+				    StrefaG12 = Table.AddColumn(Zakres, "StrefaG12", each
+				        if WPrzedziale([Godzina], G12NocOd, G12NocDo) or WPrzedziale([Godzina], G12DzienOd, G12DzienDo)
+				        then "tania" else "droga", type text),
+				    // G12w (dni robocze): szczyt 6–21; soboty, niedziele i święta są w całości w strefie taniej (patrz DimData[TypDnia]).
+				    StrefaG12w = Table.AddColumn(StrefaG12, "StrefaG12w", each if [Godzina] >= 6 and [Godzina] < 21 then "droga" else "tania", type text),
+				    CzescDoby = Table.AddColumn(StrefaG12w, "CzęśćDoby", each
+				        if [Godzina] >= 22 or [Godzina] < 6 then "noc (22–6)"
+				        else if [Godzina] < 10 then "poranek (6–10)"
+				        else if [Godzina] < 16 then "dzień (10–16)"
+				        else "wieczór (16–22)", type text),
+				    CzescSort = Table.AddColumn(CzescDoby, "CzęśćDobySort", each
+				        if [Godzina] >= 22 or [Godzina] < 6 then 1 else if [Godzina] < 10 then 2 else if [Godzina] < 16 then 3 else 4, Int64.Type)
+				in
+				    CzescSort
+
+	annotation PBI_ResultType = Table
+

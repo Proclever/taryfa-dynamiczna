@@ -1,0 +1,38 @@
+/// Oś porównania trzech taryf (miara [Koszt wybranej taryfy]).
+table Taryfy
+	lineageTag: 9d56cb92-f7c9-5744-b75b-aeeb4db66e66
+
+	column Taryfa
+		dataType: string
+		lineageTag: c823b55f-aea2-5c6f-aaf4-62a1940fa333
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Taryfa]
+		sortByColumn: Kolejność
+
+		annotation SummarizationSetBy = User
+
+	column Kolejność
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cf115ec3-345c-5f6c-b4c3-e2977328f64a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Kolejność]
+
+		annotation SummarizationSetBy = User
+
+	partition Taryfy = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Taryfa", STRING,
+				    "Kolejność", INTEGER,
+				    {
+				        { "G11", 1 },
+				        { "G12", 2 },
+				        { "Dynamiczna", 3 }
+				    }
+				)
+

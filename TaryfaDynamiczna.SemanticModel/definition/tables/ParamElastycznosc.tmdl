@@ -1,0 +1,28 @@
+/// Część zużycia, którą codziennie przesuwasz do najtańszych kwadransów (0–50%).
+table ParamElastycznosc
+	lineageTag: 6f571451-bd97-502b-88fe-f8f70639da14
+
+	/// Wartość parametru (domyślnie 0.1).
+	measure 'Elastyczność Value' = SELECTEDVALUE ( ParamElastycznosc[Elastyczność], 0.1 )
+		formatString: 0%
+		lineageTag: 6cb31364-79d2-59d6-9901-798f7a06e194
+
+	column Elastyczność
+		dataType: double
+		formatString: 0%
+		lineageTag: 14e95e7e-fe0a-5486-a129-7a407465f29d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Elastyczność]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition ParamElastycznosc = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 50, 1 ), "Elastyczność", [Value] / 100 )
+
