@@ -58,7 +58,7 @@ Kontrola liczb (opcjonalnie): `py scripts\model_referencyjny.py` wypisze koszty,
 
 1. Utwórz **publiczne** repozytorium (np. `taryfa-dynamiczna`) i wypchnij do niego cały folder razem z `data/`.
 2. *Settings → Actions → General → Workflow permissions*: **Read and write permissions**.
-3. Workflow „Aktualizacja danych” uruchamia się codziennie ok. 8:17 i commituje nowe CSV (także wtedy, gdy jedno ze źródeł zawiodło – przebieg jest wtedy oznaczony jako nieudany i GitHub wysyła powiadomienie). Ręcznie: *Actions → Aktualizacja danych → Run workflow* (pole `od` pobiera dane PSE od nowa od wskazanej doby).
+3. Workflow „Aktualizacja danych” ma harmonogram codziennie o 6:17 UTC, ale GitHub uruchamia zaplanowane przebiegi z opóźnieniem – często kilkugodzinnym (w pierwszych dniach start ok. 13:00–14:00 czasu polskiego). Commituje nowe CSV (także wtedy, gdy jedno ze źródeł zawiodło – przebieg jest wtedy oznaczony jako nieudany i GitHub wysyła powiadomienie). Ręcznie: *Actions → Aktualizacja danych → Run workflow* (pole `od` pobiera dane PSE od nowa od wskazanej doby).
 
 ### 3. Power BI Desktop
 
@@ -73,7 +73,7 @@ Wymagany aktualny Power BI Desktop (raport w formacie PBIR, model w TMDL; schema
 
 1. *Opublikuj → Mój obszar roboczy*.
 2. W usłudze: *Ustawienia modelu semantycznego → Poświadczenia źródła danych → Web*: Anonimowe, Publiczny, zaznacz **Pomiń test połączenia**.
-3. *Zaplanowane odświeżanie*: codziennie, np. 10:00 (po porannym przebiegu GitHub Actions).
+3. *Zaplanowane odświeżanie*: codziennie, strefa czasowa Warszawa, np. 16:00 – po przebiegu GitHub Actions, który bywa opóźniony o kilka godzin. Włącz powiadomienia o nieudanym odświeżeniu.
 4. W raporcie: *Plik → Osadź raport → Publikuj w Internecie (publiczne)*. Wymaga włączonego przez administratora ustawienia dzierżawy **Publish to web**; dane są wtedy dostępne dla każdego (tu: wyłącznie dane publiczne).
 
 ## Model
