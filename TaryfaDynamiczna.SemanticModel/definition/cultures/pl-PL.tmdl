@@ -1,0 +1,515 @@
+cultureInfo pl-PL
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "miary.koszt__dynamiczna_oś_marży": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt – dynamiczna (oś marży)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Dynamiczna": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.koszt__g11_oś_marży": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt – G11 (oś marży)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "G11": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.punkt_opłacalności": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Punkt opłacalności"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Próg opłacalności": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.koszt__g11": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt – G11"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "G11": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.koszt__dynamiczna": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt – dynamiczna"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Dynamiczna": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.indeks_rce_średnia__100": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Indeks RCE (średnia = 100)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Cena (RCE)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.indeks_zużycia_średnia__100": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Indeks zużycia (średnia = 100)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Zużycie domu": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.p95_rce_zł_mwh": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "P95 RCE (zł/MWh)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "P95": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.mediana_rce_zł_mwh": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Mediana RCE (zł/MWh)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mediana": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.p05_rce_zł_mwh": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "P05 RCE (zł/MWh)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "P5": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.średnia_rce__ostatnie_12_mies_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Średnia RCE – ostatnie 12 mies."
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Ostatnie 12 mies.": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.średnia_rce__poprzednie_12_mies_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Średnia RCE – poprzednie 12 mies."
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Poprzednie 12 mies.": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.top_10__średnia_rce_zł_mwh": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Top 10 – średnia RCE (zł/MWh)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Średnia RCE": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.top_10__maks__rce_zł_mwh": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Top 10 – maks. RCE (zł/MWh)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Maks. RCE": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.top_10__temperatura_c": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Top 10 – temperatura (°C)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Temperatura": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.top_10__udział_pv_i_wiatru": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Top 10 – udział PV i wiatru"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "PV + wiatr": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.koszt_ev__g11": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt EV – G11"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "G11": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.koszt_ev__g12": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt EV – G12"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "G12": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.koszt_ev__dynamiczna": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Koszt EV – dynamiczna"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Dynamiczna": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "miary.efektywna_cena_ev__dynamiczna_zł_kwh": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Miary",
+			          "ConceptualProperty": "Efektywna cena EV – dynamiczna (zł/kWh)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Cena efektywna (dynamiczna)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dimslot.etykietagodziny": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DimSlot",
+			          "ConceptualProperty": "EtykietaGodziny"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Godzina": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dimdata.data": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DimData",
+			          "ConceptualProperty": "Data"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Doba": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "paramtrybev.tryb_ev": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "ParamTrybEV",
+			          "ConceptualProperty": "Tryb EV"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Tryb": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "paramtrybev.opis": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "ParamTrybEV",
+			          "ConceptualProperty": "Opis"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Kiedy ładuje": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

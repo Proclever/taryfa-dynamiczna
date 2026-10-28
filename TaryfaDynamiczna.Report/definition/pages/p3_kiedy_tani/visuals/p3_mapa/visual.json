@@ -6,7 +6,7 @@
     "y": 84,
     "z": 3000,
     "height": 460,
-    "width": 800,
+    "width": 620,
     "tabOrder": 3
   },
   "visual": {
@@ -28,6 +28,7 @@
               },
               "queryRef": "DimSlot.EtykietaGodziny",
               "nativeQueryRef": "EtykietaGodziny",
+              "displayName": "Godzina",
               "active": true
             }
           ]
@@ -78,7 +79,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "9D"
                 }
               }
             },
@@ -168,7 +169,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "9D"
                 }
               }
             },
@@ -199,7 +200,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "9D"
                 }
               }
             },

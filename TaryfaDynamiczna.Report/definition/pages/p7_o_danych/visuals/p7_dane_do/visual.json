@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "p7_dane_do",
   "position": {
-    "x": 648,
-    "y": 526,
+    "x": 16,
+    "y": 580,
     "z": 4000,
-    "height": 80,
-    "width": 301,
+    "height": 124,
+    "width": 240,
     "tabOrder": 4
   },
   "visual": {
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "11D"
+                  "Value": "12D"
                 }
               }
             },

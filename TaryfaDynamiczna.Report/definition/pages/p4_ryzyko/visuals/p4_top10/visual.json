@@ -3,9 +3,9 @@
   "name": "p4_top10",
   "position": {
     "x": 16,
-    "y": 434,
+    "y": 410,
     "z": 6000,
-    "height": 270,
+    "height": 294,
     "width": 620,
     "tabOrder": 6
   },
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "DimData.Data",
-              "nativeQueryRef": "Data"
+              "nativeQueryRef": "Data",
+              "displayName": "Doba"
             },
             {
               "field": {
@@ -41,7 +42,8 @@
                 }
               },
               "queryRef": "Miary.Top 10 – średnia RCE (zł/MWh)",
-              "nativeQueryRef": "Top 10 – średnia RCE (zł/MWh)"
+              "nativeQueryRef": "Top 10 – średnia RCE (zł/MWh)",
+              "displayName": "Średnia RCE"
             },
             {
               "field": {
@@ -55,7 +57,8 @@
                 }
               },
               "queryRef": "Miary.Top 10 – maks. RCE (zł/MWh)",
-              "nativeQueryRef": "Top 10 – maks. RCE (zł/MWh)"
+              "nativeQueryRef": "Top 10 – maks. RCE (zł/MWh)",
+              "displayName": "Maks. RCE"
             },
             {
               "field": {
@@ -69,7 +72,8 @@
                 }
               },
               "queryRef": "Miary.Top 10 – temperatura (°C)",
-              "nativeQueryRef": "Top 10 – temperatura (°C)"
+              "nativeQueryRef": "Top 10 – temperatura (°C)",
+              "displayName": "Temperatura"
             },
             {
               "field": {
@@ -83,7 +87,8 @@
                 }
               },
               "queryRef": "Miary.Top 10 – udział PV i wiatru",
-              "nativeQueryRef": "Top 10 – udział PV i wiatru"
+              "nativeQueryRef": "Top 10 – udział PV i wiatru",
+              "displayName": "PV + wiatr"
             }
           ]
         }
@@ -240,7 +245,7 @@
             "rowPadding": {
               "expr": {
                 "Literal": {
-                  "Value": "4D"
+                  "Value": "2D"
                 }
               }
             }
@@ -257,6 +262,78 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "110D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DimData.Data"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Top 10 – średnia RCE (zł/MWh)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Top 10 – maks. RCE (zł/MWh)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "115D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Top 10 – temperatura (°C)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "105D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Top 10 – udział PV i wiatru"
           }
         }
       ]

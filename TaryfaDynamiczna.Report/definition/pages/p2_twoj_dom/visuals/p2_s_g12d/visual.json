@@ -44,6 +44,20 @@
                   "Value": "'Single'"
                 }
               }
+            },
+            "numericStart": {
+              "expr": {
+                "Literal": {
+                  "Value": "0.578D"
+                }
+              }
+            },
+            "numericEnd": {
+              "expr": {
+                "Literal": {
+                  "Value": "0.578D"
+                }
+              }
             }
           }
         }
@@ -188,7 +202,7 @@
                         },
                         "Right": {
                           "Literal": {
-                            "Value": "0.5779D"
+                            "Value": "0.578D"
                           }
                         }
                       }

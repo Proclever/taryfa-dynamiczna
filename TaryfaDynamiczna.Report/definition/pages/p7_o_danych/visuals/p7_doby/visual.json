@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "p7_doby",
   "position": {
-    "x": 648,
-    "y": 618,
+    "x": 520,
+    "y": 580,
     "z": 6000,
-    "height": 86,
-    "width": 196,
+    "height": 124,
+    "width": 240,
     "tabOrder": 6
   },
   "visual": {
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "18D"
+                  "Value": "20D"
                 }
               }
             },

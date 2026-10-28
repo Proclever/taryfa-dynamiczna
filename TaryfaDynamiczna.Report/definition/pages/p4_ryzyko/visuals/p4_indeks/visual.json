@@ -3,9 +3,9 @@
   "name": "p4_indeks",
   "position": {
     "x": 648,
-    "y": 160,
+    "y": 168,
     "z": 5000,
-    "height": 262,
+    "height": 230,
     "width": 616,
     "tabOrder": 5
   },
@@ -23,11 +23,11 @@
                       "Entity": "DimSlot"
                     }
                   },
-                  "Property": "EtykietaGodziny"
+                  "Property": "Godzina"
                 }
               },
-              "queryRef": "DimSlot.EtykietaGodziny",
-              "nativeQueryRef": "EtykietaGodziny",
+              "queryRef": "DimSlot.Godzina",
+              "nativeQueryRef": "Godzina",
               "active": true
             }
           ]
@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "Miary.Indeks RCE (średnia = 100)",
-              "nativeQueryRef": "Indeks RCE (średnia = 100)"
+              "nativeQueryRef": "Indeks RCE (średnia = 100)",
+              "displayName": "Cena (RCE)"
             },
             {
               "field": {
@@ -60,7 +61,8 @@
                 }
               },
               "queryRef": "Miary.Indeks zużycia (średnia = 100)",
-              "nativeQueryRef": "Indeks zużycia (średnia = 100)"
+              "nativeQueryRef": "Indeks zużycia (średnia = 100)",
+              "displayName": "Zużycie domu"
             }
           ]
         }
@@ -75,7 +77,7 @@
                     "Entity": "DimSlot"
                   }
                 },
-                "Property": "EtykietaGodziny"
+                "Property": "Godzina"
               }
             },
             "direction": "Ascending"
@@ -97,7 +99,7 @@
             "showAxisTitle": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             },
@@ -116,6 +118,38 @@
                       "Value": "'#52514E'"
                     }
                   }
+                }
+              }
+            },
+            "titleText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'godzina doby'"
+                }
+              }
+            },
+            "titleFontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "titleColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#52514E'"
+                    }
+                  }
+                }
+              }
+            },
+            "axisType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Scalar'"
                 }
               }
             }
@@ -172,6 +206,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'solid'"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             },

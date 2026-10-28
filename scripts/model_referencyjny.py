@@ -26,8 +26,8 @@ KATALOG = Path(__file__).resolve().parent.parent / "data"
 class Parametry:
     zuzycie: float = 3000          # kWh/rok
     cena_g11: float = 0.498        # zł/kWh
-    cena_g12_dzien: float = 0.5779
-    cena_g12_noc: float = 0.3369
+    cena_g12_dzien: float = 0.578  # cennik Enea 0,5779 – suwak w raporcie ma krok 0,001
+    cena_g12_noc: float = 0.337    # cennik Enea 0,3369
     marza: float = 87              # zł/MWh
     ev: float = 0                  # kWh/rok
     tryb_ev: str = "Wieczór"       # Wieczór / Noc / Smart

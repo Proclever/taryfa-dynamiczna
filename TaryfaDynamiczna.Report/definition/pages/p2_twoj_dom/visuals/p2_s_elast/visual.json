@@ -44,6 +44,20 @@
                   "Value": "'Single'"
                 }
               }
+            },
+            "numericStart": {
+              "expr": {
+                "Literal": {
+                  "Value": "0.1D"
+                }
+              }
+            },
+            "numericEnd": {
+              "expr": {
+                "Literal": {
+                  "Value": "0.1D"
+                }
+              }
             }
           }
         }
@@ -61,7 +75,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Część zużycia przesuwana w tanie godziny'"
+                  "Value": "'Przesuwane w tanie godziny (%)'"
                 }
               }
             },

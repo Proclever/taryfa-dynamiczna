@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
   "themeCollection": {
     "baseTheme": {
       "name": "CY24SU10",
@@ -13,15 +13,12 @@
     "customTheme": {
       "name": "TaryfaDynamiczna.json",
       "reportVersionAtImport": {
-        "visual": "2.4.0",
-        "report": "3.0.0",
-        "page": "2.0.0"
+        "visual": "2.14.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
       },
       "type": "RegisteredResources"
     }
-  },
-  "filterConfig": {
-    "filters": []
   },
   "objects": {
     "outspacePane": [
@@ -84,9 +81,9 @@
   ],
   "settings": {
     "useStylableVisualContainerHeader": true,
-    "defaultDrillFilterOtherVisuals": true,
-    "useEnhancedTooltips": true,
     "exportDataMode": "AllowSummarized",
-    "allowChangeFilterTypes": true
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true
   }
 }

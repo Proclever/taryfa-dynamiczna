@@ -4,10 +4,10 @@
   "position": {
     "x": 16,
     "y": 332,
-    "z": 6000,
+    "z": 7000,
     "height": 372,
     "width": 440,
-    "tabOrder": 6
+    "tabOrder": 7
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -161,6 +161,13 @@
                 }
               }
             },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
             "showAxisTitle": {
               "expr": {
                 "Literal": {
@@ -227,6 +234,13 @@
                       "Value": "'#0B0B0B'"
                     }
                   }
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

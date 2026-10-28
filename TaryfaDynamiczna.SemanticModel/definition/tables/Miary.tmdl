@@ -324,11 +324,14 @@ table Miary
 		displayFolder: 4. Ryzyko
 		lineageTag: 7bffeb6e-dc96-5adf-b89e-33e6cfdbcb1b
 
-	/// 1 = doba z najwyższą średnią RCE w wybranym okresie.
+	/// 1 = doba z najwyższą średnią RCE w wybranym okresie (ranking w obrębie okna z fragmentatora).
 	measure 'Ranga doby wg ceny' =
 			IF (
 			    HASONEVALUE ( DimData[Data] ),
-			    RANKX ( ALLSELECTED ( DimData[Data] ), [Średnia RCE (zł/MWh)], , DESC, SKIP )
+			    VAR _doby =
+			        CALCULATETABLE ( VALUES ( DimData[Data] ), ALLSELECTED ( DimData ) )
+			    RETURN
+			        RANKX ( _doby, [Średnia RCE (zł/MWh)], , DESC, SKIP )
 			)
 		formatString: #,##0
 		displayFolder: 4. Ryzyko
@@ -696,7 +699,7 @@ table Miary
 			        & [Marża Value] & " zł/MWh taryfa dynamiczna byłaby "
 			        & IF ( _o >= 0, "tańsza", "droższa" ) & " niż G11 o "
 			        & FORMAT ( ABS ( _o ), "#,##0" ) & " zł ("
-			        & FORMAT ( ABS ( [Oszczędność %] ), "0%" ) & ")." 
+			        & FORMAT ( ABS ( [Oszczędność %] ), "0.0%" ) & ")." 
 			```
 		displayFolder: 7. Teksty
 		lineageTag: be140813-60ce-582c-a853-b5d7bbb92d31
@@ -744,9 +747,9 @@ table Miary
 
 	/// Opis domyślnego domu (strona Werdykt).
 	measure 'Założenia domu' = ```
-			"Profil Enea G11 · " & FORMAT ( [Zużycie Value], "#,##0" ) & " kWh/rok · G11 "
-			    & FORMAT ( [Cena G11 Value], "0.0000" ) & " zł/kWh · G12 " & FORMAT ( [Cena G12 dzień Value], "0.0000" ) & "/"
-			    & FORMAT ( [Cena G12 noc Value], "0.0000" ) & " zł/kWh · marża " & [Marża Value] & " zł/MWh · bez EV, pompy ciepła i PV" 
+			"Enea G11 · " & FORMAT ( [Zużycie Value], "#,##0" ) & " kWh/rok · G11 "
+			    & FORMAT ( [Cena G11 Value], "0.000" ) & " · G12 " & FORMAT ( [Cena G12 dzień Value], "0.000" ) & "/"
+			    & FORMAT ( [Cena G12 noc Value], "0.000" ) & " zł/kWh · marża " & [Marża Value] & " zł/MWh · bez auta, pompy ciepła i PV" 
 			```
 		displayFolder: 7. Teksty
 		lineageTag: f1e8d636-2b62-5076-aa2b-5369e630811b
@@ -835,30 +838,30 @@ table Miary
 	measure 'Ostatnia aktualizacja danych' =
 			VAR _t = LOOKUPVALUE ( InfoDane[Wartość], InfoDane[Klucz], "ostatnia_aktualizacja_utc" )
 			RETURN
-			    IF ( NOT ISBLANK ( _t ), "Ostatnia aktualizacja danych: " & _t & " UTC" )
+			    IF ( NOT ISBLANK ( _t ), LEFT ( _t, 16 ) & " UTC" )
 		displayFolder: 8. Okres i jakość danych
 		lineageTag: 255dd723-b997-5443-b232-6ceabdc357bb
 
 	/// Koszt dynamiczny przy marży z osi X (tabela OśMarży) – krzywa czułości.
 	measure 'Koszt – dynamiczna (oś marży)' =
-			VAR _x = SELECTEDVALUE ( OśMarży[Marża (oś)] )
+			VAR _x = SELECTEDVALUE ( 'OśMarży'[Marża (oś)] )
 			RETURN
 			    IF ( NOT ISBLANK ( _x ), [Koszt – dynamiczna (bez marży)] + _x * [kWh łącznie] / 1000 )
 		formatString: #,##0" zł"
 		displayFolder: 9. Pomocnicze do wykresów
 		lineageTag: 768c2add-d0a5-5290-8446-94427ff4d105
 
-	measure 'Koszt – G11 (oś marży)' = IF ( HASONEVALUE ( OśMarży[Marża (oś)] ), [Koszt – G11] )
+	measure 'Koszt – G11 (oś marży)' = IF ( HASONEVALUE ( 'OśMarży'[Marża (oś)] ), [Koszt – G11] )
 		formatString: #,##0" zł"
 		displayFolder: 9. Pomocnicze do wykresów
 		lineageTag: 09720a6f-8a5b-512c-85e9-8535e93705fc
 
-	/// Znacznik w punkcie osi najbliższym marży granicznej.
+	/// Znacznik w punkcie osi (co 10 zł/MWh) najbliższym marży granicznej.
 	measure 'Punkt opłacalności' =
-			VAR _x = SELECTEDVALUE ( OśMarży[Marża (oś)] )
+			VAR _x = SELECTEDVALUE ( 'OśMarży'[Marża (oś)] )
 			VAR _bep = [Marża graniczna (zł/MWh)]
 			RETURN
-			    IF ( NOT ISBLANK ( _x ) && ABS ( _x - _bep ) <= 5, [Koszt – G11] )
+			    IF ( NOT ISBLANK ( _x ) && NOT ISBLANK ( _bep ) && _x = ROUND ( _bep / 10, 0 ) * 10, [Koszt – G11] )
 		formatString: #,##0" zł"
 		displayFolder: 9. Pomocnicze do wykresów
 		lineageTag: fa7cffd1-7b80-59c7-97ed-de7ab5aba343

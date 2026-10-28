@@ -5,7 +5,7 @@
     "x": 328,
     "y": 84,
     "z": 5000,
-    "height": 236,
+    "height": 176,
     "width": 936,
     "tabOrder": 5
   },
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "ParamTrybEV.Tryb EV",
-              "nativeQueryRef": "Tryb EV"
+              "nativeQueryRef": "Tryb EV",
+              "displayName": "Tryb"
             },
             {
               "field": {
@@ -41,7 +42,8 @@
                 }
               },
               "queryRef": "ParamTrybEV.Opis",
-              "nativeQueryRef": "Opis"
+              "nativeQueryRef": "Opis",
+              "displayName": "Kiedy ładuje"
             },
             {
               "field": {
@@ -55,7 +57,8 @@
                 }
               },
               "queryRef": "Miary.Koszt EV – G11",
-              "nativeQueryRef": "Koszt EV – G11"
+              "nativeQueryRef": "Koszt EV – G11",
+              "displayName": "G11"
             },
             {
               "field": {
@@ -69,7 +72,8 @@
                 }
               },
               "queryRef": "Miary.Koszt EV – G12",
-              "nativeQueryRef": "Koszt EV – G12"
+              "nativeQueryRef": "Koszt EV – G12",
+              "displayName": "G12"
             },
             {
               "field": {
@@ -83,7 +87,8 @@
                 }
               },
               "queryRef": "Miary.Koszt EV – dynamiczna",
-              "nativeQueryRef": "Koszt EV – dynamiczna"
+              "nativeQueryRef": "Koszt EV – dynamiczna",
+              "displayName": "Dynamiczna"
             },
             {
               "field": {
@@ -97,7 +102,8 @@
                 }
               },
               "queryRef": "Miary.Efektywna cena EV – dynamiczna (zł/kWh)",
-              "nativeQueryRef": "Efektywna cena EV – dynamiczna (zł/kWh)"
+              "nativeQueryRef": "Efektywna cena EV – dynamiczna (zł/kWh)",
+              "displayName": "Cena efektywna (dynamiczna)"
             }
           ]
         }
@@ -138,7 +144,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "10D"
                 }
               }
             },
@@ -187,7 +193,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "10D"
                 }
               }
             },
@@ -254,7 +260,7 @@
             "rowPadding": {
               "expr": {
                 "Literal": {
-                  "Value": "4D"
+                  "Value": "3D"
                 }
               }
             }
@@ -271,6 +277,92 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ParamTrybEV.Tryb EV"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "260D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ParamTrybEV.Opis"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Koszt EV – G11"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Koszt EV – G12"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "120D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Koszt EV – dynamiczna"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "220D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Miary.Efektywna cena EV – dynamiczna (zł/kWh)"
           }
         }
       ]

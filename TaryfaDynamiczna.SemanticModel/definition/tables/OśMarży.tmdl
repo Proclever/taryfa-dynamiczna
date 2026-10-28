@@ -1,4 +1,4 @@
-/// Rozłączna oś X krzywej czułości koszt vs marża (niezależna od suwaka marży).
+/// Rozłączna oś X krzywej czułości koszt vs marża (niezależna od suwaka marży); od -100 zł/MWh, by pokazać ujemną marżę graniczną.
 table OśMarży
 	lineageTag: bfd7eb7b-e297-5e86-95f2-645ef843db9c
 
@@ -14,5 +14,5 @@ table OśMarży
 
 	partition OśMarży = calculated
 		mode: import
-		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 300, 10 ), "Marża (oś)", [Value] )
+		source = SELECTCOLUMNS ( GENERATESERIES ( -100, 300, 10 ), "Marża (oś)", [Value] )
 

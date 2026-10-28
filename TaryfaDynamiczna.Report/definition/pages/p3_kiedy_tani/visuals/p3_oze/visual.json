@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "p3_oze",
   "position": {
-    "x": 828,
+    "x": 648,
     "y": 320,
     "z": 5000,
     "height": 224,
-    "width": 436,
+    "width": 616,
     "tabOrder": 5
   },
   "visual": {
@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "Miary.Udział PV i wiatru w zapotrzebowaniu",
-              "nativeQueryRef": "Udział PV i wiatru w zapotrzebowaniu"
+              "nativeQueryRef": "Udział PV i wiatru w zapotrzebowaniu",
+              "active": true
             }
           ]
         },
@@ -92,6 +93,13 @@
               "expr": {
                 "Literal": {
                   "Value": "9D"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             },
@@ -183,6 +191,13 @@
                 }
               }
             },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
             "labelColor": {
               "solid": {
                 "color": {
@@ -222,7 +237,7 @@
             "titleText": {
               "expr": {
                 "Literal": {
-                  "Value": "'średnia RCE doby (zł/MWh)'"
+                  "Value": "'RCE doby (zł/MWh)'"
                 }
               }
             },
@@ -253,7 +268,7 @@
             "bubbleSize": {
               "expr": {
                 "Literal": {
-                  "Value": "-8D"
+                  "Value": "-10D"
                 }
               }
             }
@@ -316,13 +331,6 @@
                       "Value": "'#2A78D6'"
                     }
                   }
-                }
-              }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "35D"
                 }
               }
             }

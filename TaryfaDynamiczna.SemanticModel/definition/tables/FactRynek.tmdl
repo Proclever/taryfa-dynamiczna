@@ -22,6 +22,8 @@ table FactRynek
 
 		annotation SummarizationSetBy = User
 
+		annotation UnderlyingDateTimeDataType = Date
+
 	/// Numer kwadransa w dobie 1–N (N = 92/96/100).
 	column Kwadrans
 		dataType: int64

@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "p7_aktualizacja",
   "position": {
-    "x": 963,
-    "y": 526,
+    "x": 268,
+    "y": 580,
     "z": 5000,
-    "height": 80,
-    "width": 301,
+    "height": 124,
+    "width": 240,
     "tabOrder": 5
   },
   "visual": {
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "11D"
+                  "Value": "12D"
                 }
               }
             },
@@ -131,7 +131,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Aktualizacja'"
+                  "Value": "'Ostatnia aktualizacja'"
                 }
               }
             }

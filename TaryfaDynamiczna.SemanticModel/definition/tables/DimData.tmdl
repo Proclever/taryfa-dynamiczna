@@ -13,6 +13,8 @@ table DimData
 
 		annotation SummarizationSetBy = User
 
+		annotation UnderlyingDateTimeDataType = Date
+
 	column NazwaŚwięta
 		dataType: string
 		lineageTag: ccb3b23d-77cc-5560-8c2b-88c7bfd567ab
@@ -85,6 +87,8 @@ table DimData
 		sourceColumn: PoczątekMiesiąca
 
 		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column DzieńTygodniaNr
 		dataType: int64

@@ -59,7 +59,7 @@ expression LicznikWgCzasuZimowego = true meta [IsParameterQuery=true, Type="Logi
 
 	annotation PBI_NavigationStepName = Navigation
 
-	annotation PBI_ResultType = Logical
+	annotation PBI_ResultType = Exception
 
 /// Próg temperatury dla stopniogodzin pompy ciepła [°C].
 expression ProgTemperaturyPC = 15 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
@@ -68,7 +68,7 @@ expression ProgTemperaturyPC = 15 meta [IsParameterQuery=true, Type="Number", Is
 
 	annotation PBI_NavigationStepName = Navigation
 
-	annotation PBI_ResultType = Number
+	annotation PBI_ResultType = Exception
 
 /// Jedyne zapytanie sięgające do źródła: CSV z katalogu data/ repozytorium GitHub.
 expression DaneSurowe =

@@ -3,9 +3,9 @@
   "name": "p4_rr",
   "position": {
     "x": 648,
-    "y": 546,
+    "y": 518,
     "z": 10000,
-    "height": 158,
+    "height": 186,
     "width": 616,
     "tabOrder": 10
   },
@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "Miary.Średnia RCE – ostatnie 12 mies.",
-              "nativeQueryRef": "Średnia RCE – ostatnie 12 mies."
+              "nativeQueryRef": "Średnia RCE – ostatnie 12 mies.",
+              "displayName": "Ostatnie 12 mies."
             },
             {
               "field": {
@@ -60,7 +61,8 @@
                 }
               },
               "queryRef": "Miary.Średnia RCE – poprzednie 12 mies.",
-              "nativeQueryRef": "Średnia RCE – poprzednie 12 mies."
+              "nativeQueryRef": "Średnia RCE – poprzednie 12 mies.",
+              "displayName": "Poprzednie 12 mies."
             }
           ]
         }
@@ -172,6 +174,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'solid'"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             },

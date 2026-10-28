@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "Miary.Koszt – dynamiczna (oś marży)",
-              "nativeQueryRef": "Koszt – dynamiczna (oś marży)"
+              "nativeQueryRef": "Koszt – dynamiczna (oś marży)",
+              "displayName": "Dynamiczna"
             },
             {
               "field": {
@@ -60,7 +61,8 @@
                 }
               },
               "queryRef": "Miary.Koszt – G11 (oś marży)",
-              "nativeQueryRef": "Koszt – G11 (oś marży)"
+              "nativeQueryRef": "Koszt – G11 (oś marży)",
+              "displayName": "G11"
             },
             {
               "field": {
@@ -74,7 +76,8 @@
                 }
               },
               "queryRef": "Miary.Punkt opłacalności",
-              "nativeQueryRef": "Punkt opłacalności"
+              "nativeQueryRef": "Punkt opłacalności",
+              "displayName": "Próg opłacalności"
             }
           ]
         }
@@ -186,6 +189,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'solid'"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             },

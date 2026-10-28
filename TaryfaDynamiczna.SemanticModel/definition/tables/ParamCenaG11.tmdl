@@ -1,15 +1,15 @@
-/// Cena energii czynnej G11 netto z faktury [zł/kWh]. Domyślnie: taryfa Enea 2026.
+/// Cena energii czynnej G11 netto z faktury [zł/kWh], krok 0,001 (≤ 1000 wartości – suwak what-if). Domyślnie: taryfa Enea 2026.
 table ParamCenaG11
 	lineageTag: 85afb1d7-d8aa-5d60-bb53-0c045951fd82
 
 	/// Wartość parametru (domyślnie 0.498).
 	measure 'Cena G11 Value' = SELECTEDVALUE ( ParamCenaG11[Cena G11], 0.498 )
-		formatString: 0.0000" zł/kWh"
+		formatString: 0.000" zł/kWh"
 		lineageTag: d25ae563-41c8-5a28-8b6e-f8edc8d83fda
 
 	column 'Cena G11'
 		dataType: double
-		formatString: 0.0000" zł/kWh"
+		formatString: 0.000" zł/kWh"
 		lineageTag: 412c284f-de0a-5582-8ed8-b92e929b5010
 		summarizeBy: none
 		isNameInferred
@@ -24,5 +24,5 @@ table ParamCenaG11
 
 	partition ParamCenaG11 = calculated
 		mode: import
-		source = SELECTCOLUMNS ( GENERATESERIES ( 1000, 15000, 1 ), "Cena G11", [Value] / 10000 )
+		source = SELECTCOLUMNS ( GENERATESERIES ( 100, 1000, 1 ), "Cena G11", [Value] / 1000 )
 

@@ -4,14 +4,21 @@ model Model
 	discourageImplicitMeasures
 	sourceQueryCulture: pl-PL
 	dataAccessOptions
+		fastCombine
 		legacyRedirects
 		returnErrorValuesAsNull
 
 queryGroup Parametry
 
+	annotation PBI_QueryGroupOrder = 0
+
 queryGroup Pomocnicze
 
+	annotation PBI_QueryGroupOrder = 1
+
 queryGroup 'Tabele modelu'
+
+	annotation PBI_QueryGroupOrder = 2
 
 annotation PBI_QueryOrder = ["RepoGitHub", "GalazGitHub", "G12NocOd", "G12NocDo", "G12DzienOd", "G12DzienDo", "LicznikWgCzasuZimowego", "ProgTemperaturyPC", "DaneSurowe", "Manifest", "Okna", "fnOkno12M", "Swieta", "RynekSurowy", "PogodaGodzinowa", "PogodaKlimatologia", "StopniogodzinyNorma", "ProfilOSD", "FactRynek", "DimData", "DimSlot", "InfoDane"]
 
@@ -36,4 +43,6 @@ ref table ParamTrybEV
 ref table Taryfy
 ref table OśMarży
 ref table Miary
+
+ref cultureInfo pl-PL
 

@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "p7_temp",
   "position": {
-    "x": 1068,
-    "y": 618,
+    "x": 1024,
+    "y": 580,
     "z": 8000,
-    "height": 86,
-    "width": 196,
+    "height": 124,
+    "width": 240,
     "tabOrder": 8
   },
   "visual": {
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "18D"
+                  "Value": "20D"
                 }
               }
             },
@@ -131,7 +131,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Temperatura z normy'"
+                  "Value": "'Temperatura z normy (IMGW)'"
                 }
               }
             }

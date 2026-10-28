@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "p3_profil",
   "position": {
-    "x": 828,
+    "x": 648,
     "y": 84,
     "z": 4000,
     "height": 224,
-    "width": 436,
+    "width": 616,
     "tabOrder": 4
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "DimSlot"
                     }
                   },
-                  "Property": "Etykieta"
+                  "Property": "Godzina"
                 }
               },
-              "queryRef": "DimSlot.Etykieta",
-              "nativeQueryRef": "Etykieta",
+              "queryRef": "DimSlot.Godzina",
+              "nativeQueryRef": "Godzina",
               "active": true
             }
           ]
@@ -79,7 +79,7 @@
                     "Entity": "DimSlot"
                   }
                 },
-                "Property": "Etykieta"
+                "Property": "Godzina"
               }
             },
             "direction": "Ascending"
@@ -101,7 +101,7 @@
             "showAxisTitle": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             },
@@ -120,6 +120,38 @@
                       "Value": "'#52514E'"
                     }
                   }
+                }
+              }
+            },
+            "titleText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'godzina doby'"
+                }
+              }
+            },
+            "titleFontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "titleColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#52514E'"
+                    }
+                  }
+                }
+              }
+            },
+            "axisType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Scalar'"
                 }
               }
             }
@@ -176,6 +208,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'solid'"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             },

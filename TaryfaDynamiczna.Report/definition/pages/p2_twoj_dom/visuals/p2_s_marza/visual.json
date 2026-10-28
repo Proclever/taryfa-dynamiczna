@@ -44,6 +44,20 @@
                   "Value": "'Single'"
                 }
               }
+            },
+            "numericStart": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            },
+            "numericEnd": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
             }
           }
         }
@@ -61,7 +75,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Marża sprzedawcy dynamicznej (zł/MWh)'"
+                  "Value": "'Marża sprzedawcy (zł/MWh)'"
                 }
               }
             },

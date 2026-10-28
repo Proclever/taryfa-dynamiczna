@@ -107,7 +107,7 @@ Kluczowe miary: `kWh łącznie`, `Koszt – dynamiczna`, `Koszt – G11`, `Koszt
 - RCE (PSE) to publiczny zamiennik indeksu TGE, do którego indeksowane są oferty dynamiczne.
 - Porównania mają sens wyłącznie dla 12 pełnych miesięcy – domyślnie „Ostatnie 12 mies.” (fragmentator synchronizowany na stronach 1–6).
 - Do 30.09.2025 RCE było godzinowe (kwadranse z tą samą ceną), od 1.10.2025 jest 15-minutowe; doby zmiany czasu mają 92 lub 100 kwadransów.
-- Domyślne ceny: taryfa Enea 2026 (G11 0,4980 zł/kWh; G12 0,5779 / 0,3369 zł/kWh netto); marża 87 zł/MWh (cennik Enea „Ceny Dynamiczne”, III kw. 2025). Wpisz własne z faktury.
+- Domyślne ceny: taryfa Enea 2026 (G11 0,498 zł/kWh; G12 0,578 / 0,337 zł/kWh netto – w cenniku 0,5779 / 0,3369, suwaki mają krok 0,001 zł/kWh); marża 87 zł/MWh (cennik Enea „Ceny Dynamiczne”, III kw. 2025). Wpisz własne z faktury.
 
 ## Dostosowanie
 

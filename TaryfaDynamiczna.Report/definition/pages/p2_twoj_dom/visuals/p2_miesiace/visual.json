@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "Miary.Koszt – G11",
-              "nativeQueryRef": "Koszt – G11"
+              "nativeQueryRef": "Koszt – G11",
+              "displayName": "G11"
             },
             {
               "field": {
@@ -60,7 +61,8 @@
                 }
               },
               "queryRef": "Miary.Koszt – dynamiczna",
-              "nativeQueryRef": "Koszt – dynamiczna"
+              "nativeQueryRef": "Koszt – dynamiczna",
+              "displayName": "Dynamiczna"
             }
           ]
         }
@@ -175,6 +177,13 @@
                 }
               }
             },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
             "showAxisTitle": {
               "expr": {
                 "Literal": {
@@ -248,6 +257,13 @@
                       "Value": "'#52514E'"
                     }
                   }
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

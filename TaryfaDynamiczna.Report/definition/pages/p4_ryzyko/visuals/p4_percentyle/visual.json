@@ -3,9 +3,9 @@
   "name": "p4_percentyle",
   "position": {
     "x": 16,
-    "y": 160,
+    "y": 168,
     "z": 4000,
-    "height": 262,
+    "height": 230,
     "width": 620,
     "tabOrder": 4
   },
@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "Miary.P95 RCE (zł/MWh)",
-              "nativeQueryRef": "P95 RCE (zł/MWh)"
+              "nativeQueryRef": "P95 RCE (zł/MWh)",
+              "displayName": "P95"
             },
             {
               "field": {
@@ -60,7 +61,8 @@
                 }
               },
               "queryRef": "Miary.Mediana RCE (zł/MWh)",
-              "nativeQueryRef": "Mediana RCE (zł/MWh)"
+              "nativeQueryRef": "Mediana RCE (zł/MWh)",
+              "displayName": "Mediana"
             },
             {
               "field": {
@@ -74,7 +76,8 @@
                 }
               },
               "queryRef": "Miary.P05 RCE (zł/MWh)",
-              "nativeQueryRef": "P05 RCE (zł/MWh)"
+              "nativeQueryRef": "P05 RCE (zł/MWh)",
+              "displayName": "P5"
             }
           ]
         }
@@ -118,7 +121,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "8D"
                 }
               }
             },
@@ -186,6 +189,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'solid'"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             },

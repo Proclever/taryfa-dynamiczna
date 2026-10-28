@@ -44,6 +44,20 @@
                   "Value": "'Single'"
                 }
               }
+            },
+            "numericStart": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "numericEnd": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
             }
           }
         }
@@ -61,7 +75,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Ładowanie auta elektrycznego (kWh/rok)'"
+                  "Value": "'Auto elektryczne (kWh/rok)'"
                 }
               }
             },
